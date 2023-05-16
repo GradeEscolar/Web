@@ -7,6 +7,9 @@
             <label for="email">E-Mail</label><br />
             <input type="email" id="email" v-model="usuario.email" /><br />
             <br />
+            <label for="email">Senha</label><br />
+            <input type="password" id="senha" v-model="usuario.senha" /><br />
+            <br />
             <button type="submit">Enviar</button><br />
             <br />
             <mark v-if="submitResult">{{ submitResult }}</mark>
@@ -21,7 +24,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import Usuario from '@/classes/Usuario';
-import Defaultresponse from '@/classes/DefaultResponse';
+import DefaultResponse from '@/classes/DefaultResponse';
 import TabelaUsuarios from '@/components/TabelaUsuarios.vue';
 
 export default defineComponent({
@@ -49,16 +52,15 @@ export default defineComponent({
         },
         async cadastrarUsuario() {
             this.submitResult = undefined;
-            this.usuario.senha = this.usuario.email?.substring(0, 10);
             this.usuario.id = undefined;
             try {
-                let response = await this.axios.post<Defaultresponse>(this.apiUsuario, this.usuario);
+                let response = await this.axios.post<DefaultResponse>(this.apiUsuario, this.usuario);
                 this.usuario = new Usuario();
                 this.usuarios = await this.obterUsuarios();
                 this.submitResult = "Ok!";
             }
             catch (error: any) {
-                let response = error.response.data as Defaultresponse;
+                let response = error.response.data as DefaultResponse;
                 this.submitResult = response.message;
             }
         },

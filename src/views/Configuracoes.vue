@@ -1,12 +1,12 @@
 <template>
-    <p>Grade</p>
+    <p>Configurações</p>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-    name: 'Grade',
+    name: 'Configuracoes',
 
     data(): {
         access_token: string | undefined

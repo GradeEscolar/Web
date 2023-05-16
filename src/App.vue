@@ -4,12 +4,16 @@
   </header>
 
   <nav>
-    <div v-if="page != 'Grade'">
-      <a @click="goToPage('Home')">Home</a> |
-      <a @click="goToPage('Cadastro')">Cadastro</a>
+    <div v-if="paginasSeguras.includes(page ?? '')">
+      <a @click="goToPage('Grade')">Grade</a> |
+      <a @click="goToPage('Anotacoes')">Anotações</a> |
+      <a @click="goToPage('Configuracoes')">Configurações</a> |
+      <a @click="sair()">Sair</a>
     </div>
     <div v-else>
-      <a @click="sair()">Sair</a>
+      <a @click="goToPage('Home')">Home</a> |
+      <a @click="goToPage('Login')">Login</a> |
+      <a @click="goToPage('Cadastro')">Cadastro</a>
     </div>
   </nav>
 
@@ -20,6 +24,10 @@
       <Home @go-to-page="goToPage" />
     </div>
 
+    <div v-if="page == 'Login'">
+      <Login @go-to-page="goToPage" />
+    </div>
+
     <div v-if="page == 'Cadastro'">
       <Cadastro @go-to-page="goToPage" />
     </div>
@@ -27,29 +35,45 @@
     <div v-if="page == 'Grade'">
       <Grade @go-to-page="goToPage" />
     </div>
+
+    <div v-if="page == 'Anotacoes'">
+      <Anotacoes @go-to-page="goToPage" />
+    </div>
+
+    <div v-if="page == 'Configuracoes'">
+      <Configuracoes @go-to-page="goToPage" />
+    </div>
   </section>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 import Home from './views/Home.vue';
+import Login from './views/Login.vue';
 import Cadastro from './views/Cadastro.vue';
 import Grade from './views/Grade.vue';
+import Anotacoes from './views/Anotacoes.vue';
+import Configuracoes from './views/Configuracoes.vue';
 
 export default defineComponent({
   name: 'App',
 
   components: {
     Home,
+    Login,
     Cadastro,
-    Grade
+    Grade,
+    Anotacoes,
+    Configuracoes
   },
 
   data(): {
-    page: string | undefined
+    page: string | undefined,
+    paginasSeguras: string[]
   } {
     return {
-      page: undefined
+      page: undefined,
+      paginasSeguras: ['Grade', 'Anotacoes', 'Configuracoes']
     }
   },
 
@@ -58,7 +82,7 @@ export default defineComponent({
       this.page = page;
     },
     sair() {
-      localStorage.removeItem('token');
+      localStorage.removeItem('access_token');
       this.goToPage('Home');
     }
   },
