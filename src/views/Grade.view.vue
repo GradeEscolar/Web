@@ -1,20 +1,18 @@
 <template>
-    <p>Token: {{ token }}</p>
+    <p>Grade</p>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import Usuario from '@/classes/Usuario';
-import DefaultResponse from '@/classes/DefaultResponse';
 
 export default defineComponent({
-    name: 'Grade',
+    name: 'GradeView',
 
     data(): {
-        token: string | undefined
+        access_token: string | undefined
     } {
         return {
-            token: undefined
+            access_token: undefined
         }
     },
 
@@ -27,9 +25,9 @@ export default defineComponent({
     },
 
     mounted() {
-        let token = localStorage.getItem('token');
-        if (token) {
-            this.token = token;
+        let access_token = localStorage.getItem('access_token');
+        if (access_token) {
+            this.access_token = access_token;
         } else {
             this.goToPage('Home');
         }
