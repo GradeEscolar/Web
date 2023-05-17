@@ -6,7 +6,7 @@
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-    name: 'Grade',
+    name: 'GradeView',
 
     data(): {
         access_token: string | undefined

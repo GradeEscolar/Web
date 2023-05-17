@@ -6,7 +6,7 @@
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-    name: 'Anotacoes',
+    name: 'AnotacoesView',
 
     data(): {
         access_token: string | undefined

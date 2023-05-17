@@ -21,50 +21,50 @@
 
   <section>
     <div v-if="page == 'Home'">
-      <Home @go-to-page="goToPage" />
+      <HomeView @go-to-page="goToPage" />
     </div>
 
     <div v-if="page == 'Login'">
-      <Login @go-to-page="goToPage" />
+      <LoginView @go-to-page="goToPage" />
     </div>
 
     <div v-if="page == 'Cadastro'">
-      <Cadastro @go-to-page="goToPage" />
+      <CadastroView @go-to-page="goToPage" />
     </div>
 
     <div v-if="page == 'Grade'">
-      <Grade @go-to-page="goToPage" />
+      <GradeView @go-to-page="goToPage" />
     </div>
 
     <div v-if="page == 'Anotacoes'">
-      <Anotacoes @go-to-page="goToPage" />
+      <AnotacoesView @go-to-page="goToPage" />
     </div>
 
     <div v-if="page == 'Configuracoes'">
-      <Configuracoes @go-to-page="goToPage" />
+      <ConfiguracoesView @go-to-page="goToPage" />
     </div>
   </section>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import Home from './views/Home.vue';
-import Login from './views/Login.vue';
-import Cadastro from './views/Cadastro.vue';
-import Grade from './views/Grade.vue';
-import Anotacoes from './views/Anotacoes.vue';
-import Configuracoes from './views/Configuracoes.vue';
+import HomeView from './views/Home.view.vue';
+import LoginView from './views/Login.view.vue';
+import CadastroView from './views/Cadastro.view.vue';
+import GradeView from './views/Grade.view.vue';
+import AnotacoesView from './views/Anotacoes.view.vue';
+import ConfiguracoesView from './views/Configuracoes.view.vue';
 
 export default defineComponent({
   name: 'App',
 
   components: {
-    Home,
-    Login,
-    Cadastro,
-    Grade,
-    Anotacoes,
-    Configuracoes
+    HomeView,
+    LoginView,
+    CadastroView,
+    GradeView,
+    AnotacoesView,
+    ConfiguracoesView
   },
 
   data(): {

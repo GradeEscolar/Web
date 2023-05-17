@@ -16,12 +16,12 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import Usuario from '@/classes/Usuario';
-import TokenResponse from '@/classes/TokenResponse'
-import DefaultResponse from '@/classes/DefaultResponse';
+import Usuario from '@/models/Usuario';
+import TokenResponse from '@/api/TokenResponse'
+import DefaultResponse from '@/api/DefaultResponse';
 
 export default defineComponent({
-    name: 'Login',
+    name: 'LoginView',
 
     data(): {
         api: string,

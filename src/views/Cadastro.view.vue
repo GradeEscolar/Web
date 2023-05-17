@@ -23,12 +23,12 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import Usuario from '@/classes/Usuario';
-import DefaultResponse from '@/classes/DefaultResponse';
+import Usuario from '@/models/Usuario';
+import DefaultResponse from '@/api/DefaultResponse';
 import TabelaUsuarios from '@/components/TabelaUsuarios.vue';
 
 export default defineComponent({
-    name: 'Cadastro',
+    name: 'CadastroView',
     components: {
         TabelaUsuarios
     },
