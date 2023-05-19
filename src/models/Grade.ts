@@ -1,6 +1,6 @@
 export default class Grade {
-    id: number | undefined;
-    id_usuario: number | undefined;
-    aulas: number | undefined;
-    dias: string | undefined;
+    id: number = 0;
+    id_usuario: number = 0;
+    aulas: number = 0;
+    dias: string = '';
 }
