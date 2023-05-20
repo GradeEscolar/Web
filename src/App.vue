@@ -88,12 +88,37 @@ export default defineComponent({
   },
 
   mounted() {
+
     let page = localStorage.getItem('page');
     if (page) {
       this.page = page;
     } else {
+      localStorage.setItem('page', 'Home')
       this.page = 'Home'
     }
+
+    this.axios.interceptors.request.use(
+      config => {
+        let access_token = localStorage.getItem('access_token');
+        if (access_token)
+          config.headers.Authorization = `Bearer ${access_token}`;
+
+        return config;
+      },
+      error => Promise.reject(error)
+    )
+
+    this.axios.interceptors.response.use(
+      value => value,
+      error => {
+        if (error.response.status == 422 || error.response.status == 401) {
+          localStorage.removeItem('access_token');
+          this.goToPage('Login')
+        }
+
+        return Promise.reject(error);
+      }
+    )
   },
 
   watch: {

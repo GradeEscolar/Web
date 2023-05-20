@@ -11,7 +11,7 @@
             <button type="reset" id="abt">Cancelar</button>
         </span>
 
-        <br />
+        <br /><br />
         <table>
             <tbody>
                 <tr v-for="disciplina in disciplinas" @click="selecionar(disciplina)">
@@ -27,7 +27,7 @@ import Disciplina from '@/models/Disciplina'
 import DefaultResponse from '@/api/DefaultResponse';
 
 export default defineComponent({
-    name: 'DisciplinaComponent',
+    name: 'DisciplinaConfigComponent',
 
     data(): {
         api: string,
@@ -45,8 +45,6 @@ export default defineComponent({
         }
     },
 
-    emits: ['disciplinas'],
-
     methods: {
         async obter() {
             try {
@@ -59,8 +57,6 @@ export default defineComponent({
             this.disciplina = new Disciplina();
             this.disciplinaSelecionada = undefined;
             this.result = undefined;
-
-            this.$emit('disciplinas', this.disciplinas);
         },
         async submit() {
             try {
