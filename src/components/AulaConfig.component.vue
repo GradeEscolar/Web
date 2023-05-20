@@ -4,7 +4,7 @@
     <form @submit.prevent="salvar()" @reset.prevent="cancelar()">
 
         <Label for="dia">Dia</Label><br />
-        <select id="dia" name="dia" v-model="dia" :disabled="edicao" @change="selecionarDia()">
+        <select id="dia" name="dia" v-model="dia" :disabled="edicao" @change="obterDados()">
             <option v-for="dia in dias" :value="dia.dia">{{ dia.nome }}</option>
         </select><br />
         <br />
@@ -51,26 +51,33 @@ import Grade from '@/models/Grade';
 import Dia from '@/models/dia';
 import Aula from '@/models/aula';
 import { defineComponent } from 'vue';
+import DefaultResponse from '@/api/DefaultResponse';
 
 export default defineComponent({
     name: "AulaConfigComponent",
 
     data(): {
+        apiGrade: string,
+        apiDisciplina: string,
+        apiAula: string,
         disciplinas: Disciplina[],
         grade: Grade,
         aulasDb: Aula[],
         aulas: Aula[],
-        dia: number
+        dia: number | undefined
         dias: Dia[],
         edicao: boolean,
     } {
         return {
+            apiGrade: process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_API_GRADE, 
+            apiDisciplina: process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_API_DISCIPLINA, 
+            apiAula: process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_API_AULA, 
             disciplinas: [],
             grade: new Grade(),
             aulasDb: [],
             aulas: [],
-            dia: 2,
-            dias: Dia.montar(),
+            dia: undefined,
+            dias: [],
             edicao: false
         }
     },
@@ -79,41 +86,42 @@ export default defineComponent({
         editar() {
             this.edicao = true;
         },
-        selecionarDia() {
-            this.aulasDb = [{ id: 1, id_grade: this.grade.id, aula: 2, dia: this.dia, id_disciplina: 3 }]
-            this.ler();
-        },
-        salvar() {
+        async salvar() {
+            await this.axios.put<DefaultResponse>(this.apiAula, this.aulas);
             this.edicao = false;
-            console.log(this.aulas);
         },
         cancelar() {
-            this.edicao = false;
             this.ler();
+            this.edicao = false;
         },
         ler() {
-            
             this.dias = Dia.montarAtivos(this.grade.dias);
-            this.aulas = Aula.montar(this.grade, this.aulasDb, this.dia);
-            
+            this.aulas = Aula.montar(this.grade, this.aulasDb, this.dia!);
         },
         persistir() {
 
+        }, 
+        async obterDadosIniciais() {
+            let pDisciplina = this.axios.get<Disciplina[]>(this.apiDisciplina);
+            let pGrade = this.axios.get<Grade>(this.apiGrade);
+            let [rDisciplina, rGrade] = await Promise.all([pDisciplina, pGrade]);
+            this.disciplinas = rDisciplina.data;
+            this.grade = rGrade.data;
+        },
+        async obterDados() {
+            let aulaPesquisa = new Aula();
+            aulaPesquisa.id_grade = this.grade.id;
+            aulaPesquisa.dia = this.dia ?? Number(this.grade.dias.substring(0, 1))
+            this.dia = aulaPesquisa.dia;
+            let aulaResponse = await this.axios.post<Aula[]>(this.apiAula, aulaPesquisa);
+            this.aulasDb = aulaResponse.data;
+            this.ler();
         }
     },
 
-    mounted() {
-        this.disciplinas = [
-            { id: 1, id_usuario: 1, disciplina: 'Artes' },
-            { id: 2, id_usuario: 1, disciplina: 'Ciências' },
-            { id: 3, id_usuario: 1, disciplina: 'Matemática' }
-        ];
-
-        this.grade = { id: 1, id_usuario: 1, dias: '2;3;4;5;6', aulas: 5 };
-        this.aulasDb = [{ id: 1, id_grade: this.grade.id, aula: 2, dia: 2, id_disciplina: 3 }]
-
-        this.ler();
-        this.dia = this.dias[0].dia;
+    async mounted() {
+        await this.obterDadosIniciais();
+        await this.obterDados();
     },
 
 })

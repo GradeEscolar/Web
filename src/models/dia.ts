@@ -11,11 +11,11 @@ export default class Dia {
 
     static montar(): Dia[] {
         return [
-            {dia: 2, nome: 'Segunda', ativo: true}, 
-            {dia: 3, nome: 'Terça', ativo: true}, 
-            {dia: 4, nome: 'Quarta', ativo: true}, 
-            {dia: 5, nome: 'Quinta', ativo: true}, 
-            {dia: 6, nome: 'Sexta', ativo: true}, 
+            {dia: 2, nome: 'Segunda', ativo: false}, 
+            {dia: 3, nome: 'Terça', ativo: false}, 
+            {dia: 4, nome: 'Quarta', ativo: false}, 
+            {dia: 5, nome: 'Quinta', ativo: false}, 
+            {dia: 6, nome: 'Sexta', ativo: false}, 
             {dia: 7, nome: 'Sábado', ativo: false}, 
             {dia: 1, nome: 'Domingo', ativo: false}
         ];
