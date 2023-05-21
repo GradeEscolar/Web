@@ -48,8 +48,8 @@
 <script lang="ts">
 import Disciplina from '@/models/Disciplina';
 import Grade from '@/models/Grade';
-import Dia from '@/models/dia';
-import Aula from '@/models/aula';
+import Dia from '@/models/Dia';
+import Aula from '@/models/Aula';
 import { defineComponent } from 'vue';
 import DefaultResponse from '@/api/DefaultResponse';
 

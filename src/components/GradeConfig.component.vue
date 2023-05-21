@@ -26,7 +26,7 @@
 <script lang="ts">
 import DefaultResponse from '@/api/DefaultResponse';
 import Grade from '@/models/Grade';
-import Dia from '@/models/dia';
+import Dia from '@/models/Dia';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
