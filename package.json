@@ -7,6 +7,8 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "@types/markdown-it": "^12.2.3",
+    "markdown-it": "^13.0.1",
     "vue": "^3.2.13",
     "vue-axios": "^3.5.2"
   },
