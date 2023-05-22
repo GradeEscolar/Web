@@ -1,7 +1,7 @@
 <template>
     <input type="date" v-model="data" @change="setDate()" /><br />
     <br />
-    {{ nomeDia(dia) }}<br />
+    {{ dia?.nome }}<br />
     <br />
     <table v-if="aulas">
         <thead>
@@ -11,12 +11,17 @@
             </tr>
         </thead>
         <tbody>
-            <tr v-for="aula in aulas">
+            <tr v-for="aula in aulas" @click="setAula(aula)">
                 <td>{{ aula.aula }}</td>
                 <td>{{ obterDisciplina(aula.id_disciplina) }}</td>
             </tr>
         </tbody>
-    </table>
+    </table><br />
+    <br />
+    <label v-if="anotacao" for="anotacao">Anotações</label><br />
+    <textarea v-if="anotacao" id="anotacao"  v-model.trim="anotacao.anotacao" rows="5" cols="40" /><br />
+    <button v-if="anotacao" type="button" @click="salvarAnotacao()">Salvar</button>
+    
 </template>
 
 <script lang="ts">
@@ -37,10 +42,9 @@ export default defineComponent({
         grade: Grade | undefined,
         disciplinas: Disciplina[] | undefined,
         data: string | undefined,
-        dt: Date | undefined,
-        dia: number | undefined,
-        dias: Dia[],
+        dia: Dia | undefined,
         aulas: Aula[] | undefined,
+        aula: Aula | undefined,
         anotacao: Anotacao | undefined
     } {
         return {
@@ -48,10 +52,9 @@ export default defineComponent({
             grade: undefined,
             disciplinas: undefined,
             data: undefined,
-            dt: undefined,
             dia: undefined,
-            dias: Dia.montar(),
             aulas: undefined,
+            aula: undefined,
             anotacao: undefined
         }
     },
@@ -63,19 +66,26 @@ export default defineComponent({
             this.$emit('goToPage', page);
         },
         async setDate() {
-            this.dt = new Date(`${this.data!}T00:00:00.000-03:00`);
-            this.dia = this.dt.getDay() + 1;
+            this.dia = Dia.obterDia(this.data!);
             await this.obterAulas();
         },
         async obterAulas() {
-            let aulas = await this.api.obterAulas(this.grade!.id, this.dia!);
+            let aulas = await this.api.obterAulas(this.grade!.id, this.dia!.dia);
             this.aulas = aulas.length == 0 ? undefined : aulas;
+            if(this.aulas) {
+                await this.setAula(this.aulas[0]);
+            }
+        },
+        async setAula(aula: Aula) {
+            this.aula = aula;
+            this.anotacao = await this.api.obterAnotacaoGrade(this.aula, this.data!);
         },
         obterDisciplina(id_disciplina: number | undefined): string | undefined {
             return this.disciplinas?.find(d => d.id == id_disciplina)?.disciplina;
         },
-        nomeDia(dia: number | undefined) {
-            return this.dias.find(d => d.dia == dia)?.nome;
+        async salvarAnotacao() {
+            await this.api.salvarAnotacao(this.anotacao!);
+            this.anotacao = await this.api.obterAnotacaoGrade(this.aula!, this.data!);
         }
     },
 

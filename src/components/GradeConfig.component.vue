@@ -45,7 +45,7 @@ export default defineComponent({
             hasData: false,
             grade: new Grade(),
             aulas: 0,
-            dias: Dia.montar(),
+            dias: Dia.dias(),
             result: undefined
         }
     },
