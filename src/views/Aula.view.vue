@@ -35,7 +35,7 @@ import Api from '@/api/Api';
 import Dia from '@/models/Dia';
 
 export default defineComponent({
-    name: 'GradeView',
+    name: 'AulaView',
 
     data(): {
         api: Api,
@@ -91,7 +91,7 @@ export default defineComponent({
 
     async mounted() {
         if (!Auth.autenticado()) {
-            this.goToPage('Login');
+            this.goToPage('Home');
             return;
         }
 
@@ -108,7 +108,7 @@ export default defineComponent({
             sessionStorage.setItem('data', this.data);
         }
 
-        this.setDate();
+        await this.setDate();
     },
 
     watch: {

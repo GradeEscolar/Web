@@ -88,7 +88,7 @@ export default defineComponent({
 
     async mounted() {
         if (!Auth.autenticado()) {
-            this.goToPage('Login');
+            this.goToPage('Home');
             return;
         }
 
