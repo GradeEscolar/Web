@@ -1,11 +1,11 @@
 <template>
   <header>
-    <HeaderComponent @go-to-page="goToPage" :page="page" />
+    <HeaderComponent @go-to-page="goToPage" :page="page" :hide-back-button="hideBackButton" />
   </header>
 
   <main>
 
-    <section>
+    <section class="main_section">
 
       <div v-if="page == 'Home'">
         <HomeView @go-to-page="goToPage" />
@@ -24,7 +24,7 @@
       </div>
 
       <div v-if="page == 'Aula'">
-        <AulaView @go-to-page="goToPage" />
+        <AulaView @go-to-page="goToPage" @hide-back-button="definirHideBackButton"/>
       </div>
 
       <div v-if="page == 'Anotacoes'">
@@ -42,13 +42,14 @@
       <div v-if="page == 'AulaConfig'">
         <AulaConfigView />
       </div>
+
     </section>
 
   </main>
 
   <footer>
     <p>
-      Grade Escolar 2023 - v 0.1
+      Grade Escolar 2023 - v 1.0
     </p>
   </footer>
 </template>
@@ -83,16 +84,21 @@ export default defineComponent({
   },
 
   data(): {
-    page: string | undefined
+    page: string | undefined,
+    hideBackButton: boolean,
   } {
     return {
-      page: undefined
+      page: undefined,
+      hideBackButton: false
     }
   },
 
   methods: {
     goToPage(page: string) {
       this.page = page;
+    },
+    definirHideBackButton(hideBackButton: boolean){
+      this.hideBackButton = hideBackButton;
     },
     sair() {
       localStorage.removeItem('access_token');
@@ -110,6 +116,13 @@ export default defineComponent({
       this.page = 'Home'
     }
 
+    let hideBackButton = localStorage.getItem('hide_back_button');
+    if(hideBackButton){
+      this.hideBackButton = hideBackButton == 's' ? true : false;  
+    } else {
+      localStorage.setItem('hide_back_button', 'n');
+    }
+        
     this.axios.interceptors.request.use(
       config => {
         let access_token = localStorage.getItem('access_token');
@@ -137,6 +150,9 @@ export default defineComponent({
   watch: {
     page(newPage: string) {
       localStorage.setItem('page', newPage);
+    },
+    hideBackButton(newValue: boolean) {
+      localStorage.setItem('hide_back_button', newValue ? 's' : 'n');
     }
   }
 
@@ -150,6 +166,9 @@ export default defineComponent({
 
 :root {
   --header-height: 60px;
+  --footer-height: 15px;
+  --header-footer-height: 75px;
+  --disciplina-form-height: 106px;
   --header-icon-box-border-color: rgb(40, 50, 55);
   --header-icon-box-text-color: rgb(40, 50, 55);
   --header-icon-box-backgroud-color: rgb(240, 250, 255);
@@ -164,10 +183,17 @@ export default defineComponent({
   --lnk-color: rgb(0, 60, 155);
   --input-invalid-background-color: rgb(255, 250, 250);
   --input-invalid-border-color: rgb(150, 0, 0);
+  --input-border-color: rgb(130, 140, 145);
+  --table-border-color: rgb(200, 210, 215);
+  --table-hover-backgroud-color: rgb(240, 250, 255);
+  --table-selected-backgroud-color: rgb(240, 250, 255);
+  --info-border-color: rgb(0, 60, 155);
+  --info-background-color: rgb(240, 250, 255);
+  --font-family: 'Didact Gothic', sans-serif;
 }
 
 html {
-  font-family: 'Didact Gothic', sans-serif;
+  font-family: var(--font-family);
 }
 
 body {
@@ -188,10 +214,18 @@ header {
 }
 
 main {
-  flex-grow: 1;
-  position: relative;
-  top: 60px;
+  position: fixed;
+  width: 100vw;
+  top: var(--header-height);
+  height: calc(100vh - var(--header-footer-height));
   z-index: 0;
+  overflow-y: auto;
+}
+
+@media only screen and (hover: none) and (pointer: coarse){
+    section.main_section {
+      margin-bottom: 70px;
+    }
 }
 
 footer {
@@ -205,6 +239,7 @@ footer {
   height: 15px;
   z-index: 1;
   background-color: rgb(250, 250, 250);
+  box-shadow: 0 0 2px 2px white;
 }
 
 footer p {
@@ -219,6 +254,7 @@ section.form {
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 10px 5px 10px 5px;
 }
 
 form {
@@ -226,17 +262,33 @@ form {
   max-width: 600px;
 }
 
-form span {
+form div {
   display: flex;
-  margin: 15px 10px 0 10px;
+  margin-bottom: 10px;
 }
 
-form span.field {
+form div:last-child {
+  margin-bottom: 0;
+}
+
+form div.field {
   flex-direction: column;
 }
 
-form span.button {
+form div.button {
   flex-direction: row;
+}
+
+div.checkboxlist {
+  flex-direction: column;
+  border: 1px solid var(--input-border-color);
+  border-radius: 5px;
+  margin-top: 2px;
+}
+
+.form div.checkboxlist span {
+  padding: 2px;
+  margin-left: 10px;
 }
 
 label {
@@ -245,10 +297,11 @@ label {
 }
 
 input,
-button {
+button,
+select {
   padding: 5px;
   border-radius: 5px;
-  border: 1px solid gray;
+  border: 1px solid var(--input-border-color);
   font-size: 10pt;
 }
 
@@ -272,6 +325,18 @@ button:disabled {
   cursor: default;
 }
 
+input[type=month],
+input[type=date] {
+  font-size: 10pt;
+  font-family: 'Didact Gothic', sans-serif;
+  width: auto;
+}
+
+select {
+  font-family: 'Didact Gothic', sans-serif;
+  font-size: 10pt;
+}
+
 mark {
   background-color: white;
   border: 1px solid;
@@ -282,6 +347,81 @@ mark {
 }
 
 mark.error {
-  border-color: rgb(255, 100, 0);
+  border-color: var(--input-invalid-border-color);
+}
+
+mark.info {
+  border-color: var(--info-border-color);
+  background-color: var(--info-background-color);
+  text-align: center;
+}
+
+div.mark {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 600px;
+  padding: 10px 5px 10px 5px;
+
+}
+
+/* form */
+
+
+
+
+/* Table */
+section.table {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-grow: 1;
+  padding: 0 5px 10px 5px;
+}
+
+table {
+  width: 100%;
+  max-width: 600px;
+  border-collapse: collapse;
+}
+
+thead {
+  padding-top: 10px;
+}
+
+thead tr th {
+  padding: 6px 5px 5px 10px;
+  font-size: 12pt;
+  text-align: left;
+}
+
+thead tr th.center {
+  text-align: center;
+}
+
+table tr {
+  border-bottom: 1px solid var(--table-border-color);
+}
+
+tbody td {
+  padding: 6px;
+}
+
+tbody tr.hover:hover {
+  cursor: pointer;
+  background-color: var(--table-hover-backgroud-color);
+}
+
+tbody td.center {
+  text-align: center;
+}
+
+tbody tr td select {
+  width: 100%;
+}
+
+.selecionada {
+  font-weight: bold;
+  background-color: var(--table-selected-backgroud-color);
 }
 </style>

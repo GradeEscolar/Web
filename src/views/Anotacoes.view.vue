@@ -1,25 +1,38 @@
 <template>
-    <h3>Anotações</h3>
-    <span v-if="disciplinas">
-        <label for="disciplinas">Disciplina</label><br />
-        <select id="disciplinas" v-model="disciplina" @change="obterAnotacoes()">
-            <option v-for="disciplina in disciplinas" :value="disciplina">{{ disciplina.disciplina }}</option>
-        </select><br />
-        <br />
-        <label for="mes">Mês</label><br />
-        <input type="month" id="mes" v-model="mes" @change="obterAnotacoes()" /><br />
-        <br />
+    <section class="form">
+        <form>
+            <span v-if="disciplinas">
+                <div class="field">
+                    <label for="disciplinas">Disciplina</label>
+                    <select id="disciplinas" v-model="disciplina" @change="obterAnotacoes()">
+                        <option v-for="disciplina in disciplinas" :value="disciplina">{{ disciplina.disciplina }}</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="mes">Mês</label>
+                    <input type="month" id="mes" v-model="mes" @change="obterAnotacoes()" />
+                </div>
 
-        Anotações<br />
-        <input type="checkbox" id="titulos" v-model="exibirTitulos" />
-        <label for="titutlos">Exibir títulos</label>
-        <br />
-        <br />
-        <span v-for="anotacao in anotacoes">
-            <span v-if="exibirTitulos">{{ obterTitulo(anotacao) }}</span>
-            <span v-html="obterConteudo(anotacao)"></span>
-        </span>
+                <div class="field" v-if="anotacoes?.length ?? 0 >= 1">
+                    <span>
+                        <input type="checkbox" id="titulos" name="titulos" v-model="exibirTitulos" />
+                        <label for="titulos">Exibir títulos</label>
+                    </span>
+                </div>
+                <div v-else class="info">
+                    <mark class="info">Não existem anotações.</mark>
+                </div>
 
+            </span>
+            <div v-else class="info">
+                <mark class="info">Não existem disciplinas cadastradas.</mark>
+            </div>
+        </form>
+    </section>
+
+    <span v-for="anotacao in anotacoes">
+        <AnotacaoViewComponent :anotacao="anotacao" :disciplina="disciplina?.disciplina" :exibir-titulos="exibirTitulos">
+        </AnotacaoViewComponent>
     </span>
 </template>
 
@@ -31,9 +44,14 @@ import Dia from '@/models/Dia';
 import Disciplina from '@/models/Disciplina';
 import { defineComponent } from 'vue';
 import MarkdownIt from 'markdown-it';
+import AnotacaoViewComponent from '@/components/anotacao_view.component.vue';
 
 export default defineComponent({
     name: 'AnotacoesView',
+
+    components: {
+        AnotacaoViewComponent
+    },
 
     data(): {
         api: Api,
@@ -83,7 +101,10 @@ export default defineComponent({
         },
         obterConteudo(anotacao: Anotacao) {
             return this.md.render(anotacao.anotacao!);
-        }
+        },
+        obterDisciplina(id_disciplina: number | undefined): string | undefined {
+            return this.disciplinas?.find(d => d.id == id_disciplina)?.disciplina;
+        },
     },
 
     async mounted() {
@@ -93,7 +114,7 @@ export default defineComponent({
         }
 
         let exibirTitulos = localStorage.getItem('exibir_titulos');
-        if(exibirTitulos){
+        if (exibirTitulos) {
             this.exibirTitulos = exibirTitulos == 's';
         }
 
@@ -109,3 +130,21 @@ export default defineComponent({
     }
 });
 </script>
+
+<style scoped>
+.anotacoes_label {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.anotacoes_label label:first-child {
+    flex-grow: 1;
+}
+
+.anotacoes {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+</style>

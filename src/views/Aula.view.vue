@@ -1,27 +1,40 @@
 <template>
-    <input type="date" v-model="data" @change="setDate()" /><br />
-    <br />
-    {{ dia?.nome }}<br />
-    <br />
-    <table v-if="aulas">
-        <thead>
-            <tr>
-                <th>Aula</th>
-                <th>Disciplina</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr v-for="aula in aulas" @click="setAula(aula)">
-                <td>{{ aula.aula }}</td>
-                <td>{{ obterDisciplina(aula.id_disciplina) }}</td>
-            </tr>
-        </tbody>
-    </table><br />
-    <br />
-    <label v-if="anotacao" for="anotacao">Anotações</label><br />
-    <textarea v-if="anotacao" id="anotacao"  v-model.trim="anotacao.anotacao" rows="5" cols="40" /><br />
-    <button v-if="anotacao" type="button" @click="salvarAnotacao()">Salvar</button>
-    
+    <section class="form">
+        <form>
+            <div class="field">
+                <label for="data">Data</label>
+                <input id="data" type="date" v-model="data" @change="selecionarData()" required />
+            </div>
+        </form>
+    </section>
+    <span v-if="data">
+        <section class="table">
+            <table v-if="aulas">
+                <caption></caption>
+                <thead>
+                    <tr>
+                        <th class="center" style="width: 100px;">Aula</th>
+                        <th>Disciplina</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="hover" v-for="aula in aulas" @click="setAula(aula)"
+                        :class="{ selecionada: aulaAtiva(aula.aula) }">
+                        <td class="center">{{ aula.aula }}</td>
+                        <td>{{ obterDisciplina(aula.id_disciplina) }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div v-if="!aulas" class="mark">
+                <mark class="info">Não existem aulas para a data selecionada.</mark>
+            </div>
+
+        </section>
+
+        <AnotacaoViewComponent @editando="editando" :anotacao="anotacao" :disciplina="obterDisciplina(aula?.id_disciplina)" exibir-titulos>
+        </AnotacaoViewComponent>
+    </span>
 </template>
 
 <script lang="ts">
@@ -33,14 +46,21 @@ import Aula from '@/models/Aula';
 import { defineComponent } from 'vue';
 import Api from '@/api/Api';
 import Dia from '@/models/Dia';
+import AnotacaoViewComponent from '@/components/anotacao_view.component.vue';
+
 
 export default defineComponent({
     name: 'AulaView',
+
+    components: {
+        AnotacaoViewComponent
+    },
 
     data(): {
         api: Api,
         grade: Grade | undefined,
         disciplinas: Disciplina[] | undefined,
+        disciplina: string,
         data: string | undefined,
         dia: Dia | undefined,
         aulas: Aula[] | undefined,
@@ -51,6 +71,7 @@ export default defineComponent({
             api: new Api(this.axios),
             grade: undefined,
             disciplinas: undefined,
+            disciplina: '',
             data: undefined,
             dia: undefined,
             aulas: undefined,
@@ -59,21 +80,49 @@ export default defineComponent({
         }
     },
 
-    emits: ['goToPage'],
+    emits: ['goToPage', 'hideBackButton'],
 
     methods: {
         goToPage(page: string) {
             this.$emit('goToPage', page);
         },
-        async setDate() {
-            this.dia = Dia.obterDia(this.data!);
-            await this.obterAulas();
+        async editando(editando: boolean) {
+            this.$emit('hideBackButton', editando);
+            // if(!editando)
+            //     await this.selecionarAula(true);
         },
-        async obterAulas() {
+        async selecionarData(fromSession: boolean = false) {
+            if (this.data) {
+                this.dia = Dia.obterDia(this.data);
+                if (this.dia) {
+                    await this.selecionarAula(fromSession);
+                } else {
+                    this.aula = undefined;
+                    this.anotacao = undefined
+                }
+            }
+        },
+        async selecionarAula(fromSession: boolean = false) {
             let aulas = await this.api.obterAulas(this.grade!.id, this.dia!.dia);
-            this.aulas = aulas.length == 0 ? undefined : aulas;
-            if(this.aulas) {
-                await this.setAula(this.aulas[0]);
+            if (aulas)
+                aulas = Aula.sort(aulas);
+            this.aulas = aulas?.length == 0 ? undefined : aulas;
+            if (this.aulas) {
+                let index: number = 0;
+                if (fromSession) {
+                    let aulaSessao = sessionStorage.getItem('aula_aula');
+                    if (aulaSessao) {
+                        let aula = Number(aulaSessao);
+                        let indexSessao = this.aulas.findIndex(a => a.aula == aula);
+                        if (indexSessao >= 0)
+                            index = indexSessao;
+                    }
+                }
+
+                await this.setAula(this.aulas[index]);
+            } else {
+                this.aula = undefined;
+                this.anotacao = undefined;
             }
         },
         async setAula(aula: Aula) {
@@ -86,6 +135,9 @@ export default defineComponent({
         async salvarAnotacao() {
             await this.api.salvarAnotacao(this.anotacao!);
             this.anotacao = await this.api.obterAnotacaoGrade(this.aula!, this.data!);
+        },
+        aulaAtiva(aula: number | undefined) {
+            return this.aula?.aula == aula;
         }
     },
 
@@ -95,11 +147,13 @@ export default defineComponent({
             return;
         }
 
+        this.$emit('hideBackButton', false);
+
         let [grade, disciplinas] = await this.api.obterGradeDisciplinas();
         this.grade = grade;
         this.disciplinas = disciplinas;
 
-        let dataSessao = sessionStorage.getItem('data');
+        let dataSessao = sessionStorage.getItem('aula_data');
         if (dataSessao) {
             this.data = dataSessao;
         } else {
@@ -108,12 +162,16 @@ export default defineComponent({
             sessionStorage.setItem('data', this.data);
         }
 
-        await this.setDate();
+        await this.selecionarData(true);
     },
 
     watch: {
         data(newData: string) {
-            sessionStorage.setItem('data', newData);
+            sessionStorage.setItem('aula_data', newData);
+        },
+
+        aula(newAula: Aula) {
+            sessionStorage.setItem('aula_aula', newAula?.aula.toString());
         }
     }
 });

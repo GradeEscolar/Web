@@ -1,70 +1,57 @@
 <template>
-    <div class="tela">
+    <div class="formFix">
         <section class="form">
             <form @submit.prevent="submit()" @reset.prevent="reset()">
 
-                <span class="field">
+                <div class="field">
                     <label for="disciplina">Disciplina</label>
                     <input type="text" id="disciplina" v-model="disciplina.disciplina" />
-                </span>
+                </div>
 
-                <span class="button">
-                    <div v-if="!disciplinaSelecionada">
+                <div class="button">
+                    <span v-if="!disciplinaSelecionada">
                         <button type="submit" id="add" :disabled="!formValido">Incluir</button>
-                    </div>
-                    <div v-else>
+                    </span>
+                    <span v-else>
                         <button type="submit" id="upd" :disabled="!formValido">Salvar</button>
                         <button type="button" id="del" @click="del()">Excluir</button>
                         <button type="reset" id="abt">Cancelar</button>
-                    </div>
+                    </span>
                     <mark class="error" v-if="result">{{ result }}</mark>
-                </span>
+                </div>
             </form>
         </section>
-
-
-        <section class="table">
-            <div>
-                <table>
-                    <tbody>
-                        <tr v-for="disciplina in disciplinas" @click="selecionar(disciplina)">
-                            <td :class="{ selecionada: disciplinaAtiva(disciplina) }">{{ disciplina.disciplina }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-
     </div>
 
-    <div class="a" style="display: none;">
-        <div class="b">
-
-        </div>
-        <div class="c">
-
-        </div>
-    </div>
+    <section class="table">
+        <table>
+            <tbody>
+                <tr class="hover" v-for="disciplina in disciplinas" @click="selecionar(disciplina)">
+                    <td :class="{ selecionada: disciplinaAtiva(disciplina) }">{{ disciplina.disciplina }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 import Disciplina from '@/models/Disciplina'
 import DefaultResponse from '@/api/DefaultResponse';
+import Api from '@/api/Api';
 
 export default defineComponent({
     name: 'DisciplinaConfigComponent',
 
     data(): {
-        api: string,
+        api: Api,
         result: string | undefined,
         disciplina: Disciplina,
         disciplinaSelecionada: Disciplina | undefined,
         disciplinas: Disciplina[] | undefined
     } {
         return {
-            api: process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_API_DISCIPLINA,
+            api: new Api(this.axios),
             result: undefined,
             disciplina: new Disciplina(),
             disciplinaSelecionada: undefined,
@@ -83,9 +70,9 @@ export default defineComponent({
     },
 
     methods: {
-        async obter() {
+        async obter(): Promise<void> {
             try {
-                let response = await this.axios.get<Disciplina[]>(this.api);
+                let response = await this.axios.get<Disciplina[]>(this.api.disciplina);
                 this.disciplinas = Disciplina.sort(response.data);
             } catch (error: any) {
                 this.disciplinas = new Array<Disciplina>();
@@ -104,9 +91,9 @@ export default defineComponent({
 
             try {
                 if (!this.disciplinaSelecionada)
-                    await this.axios.post(this.api, this.disciplina);
+                    await this.axios.post(this.api.disciplina, this.disciplina);
                 else
-                    await this.axios.patch(this.api, this.disciplina);
+                    await this.axios.patch(this.api.disciplina, this.disciplina);
 
                 await this.obter();
 
@@ -123,7 +110,7 @@ export default defineComponent({
         },
         async del() {
             try {
-                await this.axios.delete(`${this.api}/${this.disciplina.id}`);
+                await this.axios.delete(`${this.api.disciplina}/${this.disciplina.id}`);
                 await this.obter();
             } catch (error: any) {
                 let response = error.response.data as DefaultResponse;
@@ -146,98 +133,13 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.a {
-    display: flex;
-    flex-direction: column;
-    background-color: antiquewhite;
-    width: 100vw;
-    height: calc(100vh - 75px);
-}
-
-.b {
-    background-color: aqua;
-    width: 100%;
-    height: 100px;
-}
-
-.c {
-    background-color: cornflowerblue;
-    width: 100%;
-    flex-grow: 1;
-}
-
-div.tela {
-    /* position: sticky;
+div.formFix {
+    position: sticky;
     top: var(--header-height);
     background-color: white;
-    padding-bottom: 15px;
     border-bottom: 1px solid var(--menu-border-color);
-    box-shadow: 0 0 2px 2px white; */
-    display: flex;
-    flex-direction: column;
-    background-color: antiquewhite;
-    width: 100vw;
-    height: calc(100vh - 75px);
+    box-shadow: 0 0 2px 2px white;
 }
 
-section.form {
-    padding-bottom: 10px;
-}
 
-section.table {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: aquamarine;
-    flex-grow: 1;
-}
-
-section.table div:first-child {
-    overflow-y: auto;
-    height: 100%;
-    width: 100%;
-    max-width: 600px;
-    background-color: blueviolet;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-table {
-    width: 100%;
-
-
-    background-color: red;
-    border-collapse: collapse;
-    border-left: 10px;
-    border-right: 10px;
-    border-top: 0;
-    border-bottom: 0;
-    max-width: 600px;
-    border-style: solid;
-    border-color: white;
-}
-
-table tbody {
-    background-color: dodgerblue;
-    width: 100%;
-    max-width: 600px;
-}
-
-table tr {
-    border: 1px solid red;
-}
-
-table td {
-    margin: 10px;
-}
-
-tr:hover {
-    cursor: pointer;
-    background-color: aliceblue;
-}
-
-.selecionada {
-    font-weight: bold;
-}
 </style>

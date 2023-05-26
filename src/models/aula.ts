@@ -17,12 +17,11 @@ export default class Aula {
         return clone
     }
 
-    static montar(grade: Grade, aulasDb: Aula[], dia: number) : Aula[] {
+    static montar(grade: Grade, aulasDb: Aula[], dia: number): Aula[] {
         let novasAulas = new Array<Aula>();
         for (let aula = 1; aula <= grade.aulas; aula++) {
             let novaAula = aulasDb.find(a => a.aula == aula && a.id_grade == grade.id && a.dia == dia)
-            if(!novaAula)
-            {
+            if (!novaAula) {
                 novaAula = {
                     id: undefined,
                     id_grade: grade.id,
@@ -31,10 +30,16 @@ export default class Aula {
                     id_disciplina: undefined
                 };
             }
-                
+
             novasAulas.push(Aula.clone(novaAula));
         }
 
         return novasAulas;
+    }
+
+    static sort(aulas: Aula[]): Aula[] {
+        return aulas.sort((a, b) => {
+            return a.aula - b.aula;
+        });
     }
 }

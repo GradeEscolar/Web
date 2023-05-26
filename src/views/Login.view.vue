@@ -1,31 +1,31 @@
 <template>
     <section class="form">
         <form @submit.prevent="signIn()">
-            <span class="field">
+            <div class="field">
                 <label for="email">E-Mail</label>
                 <input type="email" id="email" v-model="usuario.email"
-                    :pattern="emailPattern.source" required autocomplete="email" />
-            </span>
+                    :pattern="emailPattern.source" autocomplete="email" />
+            </div>
 
-            <span class="field">
+            <div class="field">
                 <label for="email">Senha</label>
-                <input type="password" id="senha" v-model="usuario.senha" :pattern="senhaPattern.source" required autocomplete="current-password" />
-            </span>
+                <input type="password" id="senha" v-model="usuario.senha" :pattern="senhaPattern.source" autocomplete="current-password" />
+            </div>
 
-            <span class="button">
+            <div class="button">
                 <button type="submit" :disabled="!formValido">Entrar</button>
                 <mark class="error" v-if="result">{{ result }}</mark>
-            </span>
+            </div>
 
         </form>
     </section>
 
     <p>
         sem cadastro?<br />
-        <span @click="goToPage('Cadastro')">
+        <div @click="goToPage('Cadastro')">
             <i class="pi pi-id-card"></i>
             cadastre-se aqui.
-        </span>
+        </div>
 
     </p>
 </template>
@@ -51,7 +51,7 @@ export default defineComponent({
             api: new Api(this.axios),
             result: undefined,
             usuario: new Usuario(),
-            emailPattern: /[a-z0-9._%+-]+@[a-z0-9.-]+.[a-z]{2,4}$/,
+            emailPattern: /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/,
             senhaPattern: /.{4,}/
         }
     },
@@ -94,8 +94,6 @@ export default defineComponent({
 })
 </script>
 <style scoped>
-
-
 p {
     margin-top: 50px;
     text-align: center;
@@ -103,7 +101,7 @@ p {
     color: gray;
 }
 
-p span {
+p div {
     display: inline-flex;
     flex-direction: column;
     align-items: center;
@@ -113,11 +111,11 @@ p span {
     font-size: 11pt;
 }
 
-p span:hover {
+p div:hover {
     text-shadow: 0 0 1px var(--lnk-hover-color);
 }
 
-p span i {
+p div i {
     font-size: 20pt;
 }
 </style>

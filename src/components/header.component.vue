@@ -45,7 +45,8 @@ export default defineComponent({
     },
 
     props: {
-        page: String
+        page: String,
+        hideBackButton: Boolean
     },
 
     emits: ['goToPage'],
@@ -90,14 +91,14 @@ export default defineComponent({
                 this.login = false;
                 this.sair = true;
             } else if (page == 'Aula') {
-                this.back = true;
+                this.back = !this.hideBackButton;
                 this.backTo = 'Menu';
                 this.icon = 'pi pi-file-edit';
                 this.title = 'Aulas';
                 this.login = false;
                 this.sair = false;
             } else if (page == 'Anotacoes') {
-                this.back = true;
+                this.back = !this.hideBackButton;
                 this.backTo = 'Menu';
                 this.icon = 'pi pi-book';
                 this.title = 'Anotações';
@@ -134,6 +135,9 @@ export default defineComponent({
 
     watch: {
         page() {
+            this.definirHeader();
+        },
+        hideBackButton() {
             this.definirHeader();
         }
     }

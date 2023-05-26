@@ -1,47 +1,53 @@
 <template>
-    <h3>Configurações - Grade</h3>
-    <form @submit.prevent="persistirGrade()" @reset.prevent="lerGrade()">
-        Dias de aula<br />
-        <div v-for="dia in dias">
-            <input type="checkbox" :id="dia.nome" :value="dia.dia" v-model="dia.ativo" :name="dia.nome" :disabled="!hasData" />
-            <label :for="dia.nome">{{ dia.nome }}</label>
-            <br />
-        </div>
+    <section class="form">
+        <form @submit.prevent="persistirGrade()" @reset.prevent="lerGrade()">
 
-        <br />
+            <label class="checkboxlist">Dias de aula</label>
+            <div class="checkboxlist">
+                <span v-for="dia in dias">
+                    <input type="checkbox" :id="dia.nome" :value="dia.dia" v-model="dia.ativo" :name="dia.nome"
+                        :disabled="!hasData" @change="validar(dia)" />
+                    <label :for="dia.nome">{{ dia.nome }}</label>
+                </span>
+            </div>
 
-        Aulas por dia<br />
-        <input type="number" id="aulas" name="aulas" min="1" max="10" step="1" required v-model.number="aulas" :disabled="!hasData"/><br />
-        <br />
+            <div class="field">
+                <label for="aulas">Aulas por dia</label>
+                <input type="number" id="aulas" name="aulas" min="1" max="10" step="1" required v-model.number="aulas"
+                    :disabled="!hasData" />
+            </div>
 
-        <button type="submit" id="submit">Salvar</button>
-        <button type="reset" id="reset">Cancelar</button><br />
-        
-        <br />
+            <div class="button">
+                <button type="submit" id="submit">Salvar</button>
+                <button type="reset" id="reset">Cancelar</button>
+                <mark v-if="result">{{ result }}</mark>
+            </div>
 
-        <mark v-if="result">{{ result }}</mark>
+        </form>
 
-    </form>
+    </section>
 </template>
+
 <script lang="ts">
 import DefaultResponse from '@/api/DefaultResponse';
 import Grade from '@/models/Grade';
 import Dia from '@/models/Dia';
 import { defineComponent } from 'vue';
+import Api from '@/api/Api';
 
 export default defineComponent({
     name: "GradeConfigComponent",
 
     data(): {
-        api: string,
-        hasData: boolean, 
+        api: Api,
+        hasData: boolean,
         grade: Grade,
         aulas: number,
         dias: Dia[],
         result: string | undefined
     } {
         return {
-            api: process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_API_GRADE, 
+            api: new Api(this.axios),
             hasData: false,
             grade: new Grade(),
             aulas: 0,
@@ -58,14 +64,19 @@ export default defineComponent({
         async persistirGrade() {
             this.grade.dias = Dia.desmontar(this.dias);
             this.grade.aulas = this.aulas;
-            await this.axios.patch<DefaultResponse>(this.api, this.grade);
+            await this.axios.patch<DefaultResponse>(this.api.grade, this.grade);
             this.result = "Grade salva!";
         },
         async obterGrade() {
-            let response = await this.axios.get<Grade>(this.api);
+            let response = await this.axios.get<Grade>(this.api.grade);
             this.grade = response.data;
             this.lerGrade();
             this.hasData = true;
+        },
+        validar(dia: Dia) {
+            if(this.dias.find(d => d.ativo) == undefined) {
+                dia.ativo = true;
+            }
         }
     },
 

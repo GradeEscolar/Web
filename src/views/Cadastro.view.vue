@@ -1,25 +1,25 @@
 <template>
     <section class="form">
         <form @submit.prevent="cadastrarUsuario">
-            <span class="field">
+            <div class="field">
                 <label for="nome">Nome</label>
-                <input type="text" id="nome" v-model="usuario.nome" :pattern="nomePattern.source" required />
-            </span>
+                <input type="text" id="nome" v-model="usuario.nome" :pattern="nomePattern.source" />
+            </div>
             
-            <span class="field">
+            <div class="field">
                 <label for="email">E-Mail</label>
-                <input type="email" id="email" v-model="usuario.email" :pattern="emailPattern.source" required autocomplete="email" />
-            </span>
+                <input type="email" id="email" v-model="usuario.email" :pattern="emailPattern.source" autocomplete="email" />
+            </div>
             
-            <span class="field">
+            <div class="field">
                 <label for="email">Senha</label>
-                <input type="password" id="senha" v-model="usuario.senha" :pattern="senhaPattern.source" required autocomplete="new-password"/>
-            </span>
+                <input type="password" id="senha" v-model="usuario.senha" :pattern="senhaPattern.source" autocomplete="new-password"/>
+            </div>
             
-            <span class="button">
+            <div class="button">
                 <button type="submit" :disabled="!formValido">Cadastrar</button>
                 <mark v-if="submitResult">{{ submitResult }}</mark>
-            </span>
+            </div>
         </form>
     </section>
 </template>

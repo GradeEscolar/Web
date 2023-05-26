@@ -56,6 +56,8 @@ export default class Api {
         anotacaoPesquisa.modo = 'grade';
         let response = await this.axios.post<Anotacao>(this.anotacao, anotacaoPesquisa);
         let anotacao = response.data;
+        if(anotacao)
+            anotacao.data = data;
         return anotacao?.id ? anotacao : anotacaoPesquisa;
     }
 
@@ -69,6 +71,7 @@ export default class Api {
     }
 
     async salvarAnotacao(anotacao: Anotacao) {
-        await this.axios.put(this.anotacao, anotacao);
+        let result = await this.axios.put<Anotacao>(this.anotacao, anotacao);
+        return result.data;
     }
 }
