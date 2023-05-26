@@ -1,17 +1,33 @@
 <template>
-    <section>
-        <form @submit.prevent="signIn">
-            <label for="email">E-Mail</label><br />
-            <input type="email" id="email" v-model="usuario.email" /><br />
-            <br />
-            <label for="email">Senha</label><br />
-            <input type="password" id="senha" v-model="usuario.senha" /><br />
-            <br />
-            <button type="submit">Entrar</button><br />
-            <br />
-            <mark v-if="result">{{ result }}</mark>
+    <section class="form">
+        <form @submit.prevent="signIn()">
+            <div class="field">
+                <label for="email">E-Mail</label>
+                <input type="email" id="email" v-model="usuario.email"
+                    :pattern="emailPattern.source" autocomplete="email" />
+            </div>
+
+            <div class="field">
+                <label for="email">Senha</label>
+                <input type="password" id="senha" v-model="usuario.senha" :pattern="senhaPattern.source" autocomplete="current-password" />
+            </div>
+
+            <div class="button">
+                <button type="submit" :disabled="!formValido">Entrar</button>
+                <mark class="error" v-if="result">{{ result }}</mark>
+            </div>
+
         </form>
     </section>
+
+    <p>
+        sem cadastro?<br />
+        <div @click="goToPage('Cadastro')">
+            <i class="pi pi-id-card"></i>
+            cadastre-se aqui.
+        </div>
+
+    </p>
 </template>
 
 <script lang="ts">
@@ -19,23 +35,42 @@ import { defineComponent } from 'vue';
 import Usuario from '@/models/Usuario';
 import TokenResponse from '@/api/TokenResponse'
 import DefaultResponse from '@/api/DefaultResponse';
+import Api from '@/api/Api';
 
 export default defineComponent({
     name: 'LoginView',
 
     data(): {
-        api: string,
+        api: Api,
         result: string | undefined,
-        usuario: Usuario
+        usuario: Usuario,
+        emailPattern: RegExp,
+        senhaPattern: RegExp
     } {
         return {
-            api: process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_API_LOGIN,
+            api: new Api(this.axios),
             result: undefined,
-            usuario: new Usuario()
+            usuario: new Usuario(),
+            emailPattern: /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/,
+            senhaPattern: /.{4,}/
+        }
+    },
+
+    computed: {
+        formValido() {
+            if (!this.usuario.email || !this.usuario.senha){
+                return false;
+            }
+
+            let emailValido = this.emailPattern.test(this.usuario.email);
+            let senhaValida = this.senhaPattern.test(this.usuario.senha);
+            
+            return emailValido && senhaValida;
         }
     },
 
     emits: ['goToPage'],
+
     methods: {
         goToPage(page: string) {
             this.$emit('goToPage', page);
@@ -44,10 +79,10 @@ export default defineComponent({
         async signIn() {
             try {
                 this.result = undefined;
-                let response = await this.axios.post<TokenResponse>(this.api, this.usuario);
+                let response = await this.axios.post<TokenResponse>(this.api.login, this.usuario);
                 this.usuario = new Usuario();
                 localStorage.setItem('access_token', response.data.access_token);
-                this.goToPage('Grade');
+                this.goToPage('Menu');
             }
             catch (error: any) {
                 let response = error.response.data as DefaultResponse;
@@ -58,3 +93,29 @@ export default defineComponent({
 
 })
 </script>
+<style scoped>
+p {
+    margin-top: 50px;
+    text-align: center;
+    font-size: 10pt;
+    color: gray;
+}
+
+p div {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 10px;
+    cursor: pointer;
+    color: black;
+    font-size: 11pt;
+}
+
+p div:hover {
+    text-shadow: 0 0 1px var(--lnk-hover-color);
+}
+
+p div i {
+    font-size: 20pt;
+}
+</style>

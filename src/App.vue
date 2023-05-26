@@ -1,85 +1,104 @@
 <template>
   <header>
-    <h1>Grade Escolar - {{ page }}</h1>
+    <HeaderComponent @go-to-page="goToPage" :page="page" :hide-back-button="hideBackButton" />
   </header>
 
-  <nav>
-    <div v-if="paginasSeguras.includes(page ?? '')">
-      <a @click="goToPage('Grade')">Grade</a> |
-      <a @click="goToPage('Anotacoes')">Anotações</a> |
-      <a @click="goToPage('Configuracoes')">Configurações</a> |
-      <a @click="sair()">Sair</a>
-    </div>
-    <div v-else>
-      <a @click="goToPage('Home')">Home</a> |
-      <a @click="goToPage('Login')">Login</a> |
-      <a @click="goToPage('Cadastro')">Cadastro</a>
-    </div>
-  </nav>
+  <main>
 
-  <hr />
+    <section class="main_section">
 
-  <section>
-    <div v-if="page == 'Home'">
-      <HomeView @go-to-page="goToPage" />
-    </div>
+      <div v-if="page == 'Home'">
+        <HomeView @go-to-page="goToPage" />
+      </div>
 
-    <div v-if="page == 'Login'">
-      <LoginView @go-to-page="goToPage" />
-    </div>
+      <div v-if="page == 'Login'">
+        <LoginView @go-to-page="goToPage" />
+      </div>
 
-    <div v-if="page == 'Cadastro'">
-      <CadastroView @go-to-page="goToPage" />
-    </div>
+      <div v-if="page == 'Cadastro'">
+        <CadastroView @go-to-page="goToPage" />
+      </div>
 
-    <div v-if="page == 'Grade'">
-      <GradeView @go-to-page="goToPage" />
-    </div>
+      <div v-if="page == 'Menu'">
+        <MenuView @go-to-page="goToPage" />
+      </div>
 
-    <div v-if="page == 'Anotacoes'">
-      <AnotacoesView @go-to-page="goToPage" />
-    </div>
+      <div v-if="page == 'Aula'">
+        <AulaView @go-to-page="goToPage" @hide-back-button="definirHideBackButton"/>
+      </div>
 
-    <div v-if="page == 'Configuracoes'">
-      <ConfiguracoesView @go-to-page="goToPage" />
-    </div>
-  </section>
+      <div v-if="page == 'Anotacoes'">
+        <AnotacoesView @go-to-page="goToPage" />
+      </div>
+
+      <div v-if="page == 'DisciplinaConfig'">
+        <DisciplinaConfigView />
+      </div>
+
+      <div v-if="page == 'GradeConfig'">
+        <GradeConfigView />
+      </div>
+
+      <div v-if="page == 'AulaConfig'">
+        <AulaConfigView />
+      </div>
+
+    </section>
+
+  </main>
+
+  <footer>
+    <p>
+      Grade Escolar 2023 - v 1.0
+    </p>
+  </footer>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import HeaderComponent from './components/header.component.vue';
 import HomeView from './views/Home.view.vue';
 import LoginView from './views/Login.view.vue';
 import CadastroView from './views/Cadastro.view.vue';
-import GradeView from './views/Grade.view.vue';
+import MenuView from './views/Menu.view.vue';
+import AulaView from './views/Aula.view.vue';
 import AnotacoesView from './views/Anotacoes.view.vue';
-import ConfiguracoesView from './views/Configuracoes.view.vue';
+import DisciplinaConfigView from './views/DisciplinaConfig.view.vue';
+import GradeConfigView from './views/GradeConfig.view.vue';
+import AulaConfigView from './views/AulaConfig.view.vue';
 
 export default defineComponent({
   name: 'App',
 
   components: {
+    HeaderComponent,
     HomeView,
     LoginView,
     CadastroView,
-    GradeView,
+    MenuView,
+    AulaView,
     AnotacoesView,
-    ConfiguracoesView
+    DisciplinaConfigView,
+    GradeConfigView,
+    AulaConfigView
   },
 
   data(): {
     page: string | undefined,
-    paginasSeguras: string[]
+    hideBackButton: boolean,
   } {
     return {
       page: undefined,
-      paginasSeguras: ['Grade', 'Anotacoes', 'Configuracoes']
+      hideBackButton: false
     }
   },
 
   methods: {
     goToPage(page: string) {
       this.page = page;
+    },
+    definirHideBackButton(hideBackButton: boolean){
+      this.hideBackButton = hideBackButton;
     },
     sair() {
       localStorage.removeItem('access_token');
@@ -97,6 +116,13 @@ export default defineComponent({
       this.page = 'Home'
     }
 
+    let hideBackButton = localStorage.getItem('hide_back_button');
+    if(hideBackButton){
+      this.hideBackButton = hideBackButton == 's' ? true : false;  
+    } else {
+      localStorage.setItem('hide_back_button', 'n');
+    }
+        
     this.axios.interceptors.request.use(
       config => {
         let access_token = localStorage.getItem('access_token');
@@ -124,6 +150,9 @@ export default defineComponent({
   watch: {
     page(newPage: string) {
       localStorage.setItem('page', newPage);
+    },
+    hideBackButton(newValue: boolean) {
+      localStorage.setItem('hide_back_button', newValue ? 's' : 'n');
     }
   }
 
@@ -131,12 +160,268 @@ export default defineComponent({
 
 </script>
 
+
 <style>
-a {
-  cursor: pointer;
+@import url('https://fonts.googleapis.com/css2?family=Didact+Gothic&family=Indie+Flower&family=Lobster+Two&family=Sacramento&display=swap');
+
+:root {
+  --header-height: 60px;
+  --footer-height: 15px;
+  --header-footer-height: 75px;
+  --disciplina-form-height: 106px;
+  --header-icon-box-border-color: rgb(40, 50, 55);
+  --header-icon-box-text-color: rgb(40, 50, 55);
+  --header-icon-box-backgroud-color: rgb(240, 250, 255);
+  --header-background-color: rgb(70, 70, 70);
+  --header-text-color: rgb(210, 210, 210);
+  --button-background-color: rgb(60, 60, 150);
+  --button-background-color-disabled: rgb(140, 140, 150);
+  --button-text-color: rgb(240, 240, 240);
+  --menu-border-color: rgb(40, 50, 55);
+  --menu-background-color: rgb(240, 250, 255);
+  --lnk-hover-color: rgb(0, 60, 155);
+  --lnk-color: rgb(0, 60, 155);
+  --input-invalid-background-color: rgb(255, 250, 250);
+  --input-invalid-border-color: rgb(150, 0, 0);
+  --input-border-color: rgb(130, 140, 145);
+  --table-border-color: rgb(200, 210, 215);
+  --table-hover-backgroud-color: rgb(240, 250, 255);
+  --table-selected-backgroud-color: rgb(240, 250, 255);
+  --info-border-color: rgb(0, 60, 155);
+  --info-background-color: rgb(240, 250, 255);
+  --font-family: 'Didact Gothic', sans-serif;
+}
+
+html {
+  font-family: var(--font-family);
+}
+
+body {
+  margin: 0;
 }
 
 #app {
   cursor: default;
+  display: flex;
+}
+
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1;
+}
+
+main {
+  position: fixed;
+  width: 100vw;
+  top: var(--header-height);
+  height: calc(100vh - var(--header-footer-height));
+  z-index: 0;
+  overflow-y: auto;
+}
+
+@media only screen and (hover: none) and (pointer: coarse){
+    section.main_section {
+      margin-bottom: 70px;
+    }
+}
+
+footer {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: right;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 15px;
+  z-index: 1;
+  background-color: rgb(250, 250, 250);
+  box-shadow: 0 0 2px 2px white;
+}
+
+footer p {
+  color: rgb(150, 170, 175);
+  font-size: 7pt;
+  padding: 2px 10px 2px 0;
+  margin: 0;
+}
+
+/* Form */
+section.form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 5px 10px 5px;
+}
+
+form {
+  width: 100%;
+  max-width: 600px;
+}
+
+form div {
+  display: flex;
+  margin-bottom: 10px;
+}
+
+form div:last-child {
+  margin-bottom: 0;
+}
+
+form div.field {
+  flex-direction: column;
+}
+
+form div.button {
+  flex-direction: row;
+}
+
+div.checkboxlist {
+  flex-direction: column;
+  border: 1px solid var(--input-border-color);
+  border-radius: 5px;
+  margin-top: 2px;
+}
+
+.form div.checkboxlist span {
+  padding: 2px;
+  margin-left: 10px;
+}
+
+label {
+  padding-left: 5px;
+  padding-bottom: 2px;
+}
+
+input,
+button,
+select {
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid var(--input-border-color);
+  font-size: 10pt;
+}
+
+input:invalid {
+  border-color: var(--input-invalid-border-color);
+  background-color: var(--input-invalid-background-color);
+}
+
+button {
+  max-width: 150px;
+  min-width: 100px;
+  margin-right: 10px;
+  border: 1px solid var(--button-background-color);
+  background-color: var(--button-background-color);
+  color: var(--button-text-color);
+  cursor: pointer;
+}
+
+button:disabled {
+  background-color: var(--button-background-color-disabled);
+  cursor: default;
+}
+
+input[type=month],
+input[type=date] {
+  font-size: 10pt;
+  font-family: 'Didact Gothic', sans-serif;
+  width: auto;
+}
+
+select {
+  font-family: 'Didact Gothic', sans-serif;
+  font-size: 10pt;
+}
+
+mark {
+  background-color: white;
+  border: 1px solid;
+  border-radius: 5px;
+  flex-grow: 1;
+  padding: 4px;
+  font-size: 10pt;
+}
+
+mark.error {
+  border-color: var(--input-invalid-border-color);
+}
+
+mark.info {
+  border-color: var(--info-border-color);
+  background-color: var(--info-background-color);
+  text-align: center;
+}
+
+div.mark {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 600px;
+  padding: 10px 5px 10px 5px;
+
+}
+
+/* form */
+
+
+
+
+/* Table */
+section.table {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-grow: 1;
+  padding: 0 5px 10px 5px;
+}
+
+table {
+  width: 100%;
+  max-width: 600px;
+  border-collapse: collapse;
+}
+
+thead {
+  padding-top: 10px;
+}
+
+thead tr th {
+  padding: 6px 5px 5px 10px;
+  font-size: 12pt;
+  text-align: left;
+}
+
+thead tr th.center {
+  text-align: center;
+}
+
+table tr {
+  border-bottom: 1px solid var(--table-border-color);
+}
+
+tbody td {
+  padding: 6px;
+}
+
+tbody tr.hover:hover {
+  cursor: pointer;
+  background-color: var(--table-hover-backgroud-color);
+}
+
+tbody td.center {
+  text-align: center;
+}
+
+tbody tr td select {
+  width: 100%;
+}
+
+.selecionada {
+  font-weight: bold;
+  background-color: var(--table-selected-backgroud-color);
 }
 </style>

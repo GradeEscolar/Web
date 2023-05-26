@@ -1,50 +1,56 @@
 <template>
-    <h3>Configurações - Aulas</h3>
-
-    <form @submit.prevent="salvar()" @reset.prevent="cancelar()">
-
-        <Label for="dia">Dia</Label><br />
-        <select id="dia" name="dia" v-model="dia" :disabled="edicao" @change="obterDados()">
-            <option v-for="dia in dias" :value="dia.dia">{{ dia.nome }}</option>
-        </select><br />
-        <br />
-
-        <span v-if="!edicao">
-            <button type="button" @click="editar()">Editar</button>
-        </span>
-        <span v-else>
-            <button type="submit">Salvar</button>
-            <button type="reset">Cancelar</button>
-        </span>
+    <section class="form">
 
 
-        <br />
-        <br />
 
+        <form @submit.prevent="salvar()" @reset.prevent="cancelar()">
 
-        Aulas<br />
-        <table>
-            <thead>
-                <tr>
-                    <th>Aula</th>
-                    <th>Disciplina</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="aula in aulas">
-                    <td>{{ aula.aula }}</td>
-                    <td>
-                        <select v-model="aula.id_disciplina" :disabled="!edicao">
-                            <option :value="undefined">-- aula vaga --</option>
-                            <option v-for="disciplina in disciplinas" :value="disciplina.id">{{ disciplina.disciplina }}
-                            </option>
-                        </select>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </form>
+            <div class="field">
+                <Label for="dia">Dia</Label>
+                <select id="dia" name="dia" v-model="dia" :disabled="edicao" @change="obterDados()">
+                    <option v-for="dia in dias" :value="dia.dia">{{ dia.nome }}</option>
+                </select>
+            </div>
+
+            <div class="button">
+                <span v-if="!edicao">
+                    <button type="button" @click="editar()">Editar</button>
+                </span>
+                <span v-else>
+                    <button type="submit">Salvar</button>
+                    <button type="reset">Cancelar</button>
+                </span>
+            </div>
+
+            <section class="table">
+                <table>
+                    <caption></caption>
+                    <thead>
+                        <tr>
+                            <th class="center">Aula</th>
+                            <th class="center">Disciplina</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="aula in aulas">
+                            <td class="center">{{ aula.aula }}</td>
+                            <td>
+                                <select v-model="aula.id_disciplina" :disabled="!edicao">
+                                    <option :value="undefined">-- aula vaga --</option>
+                                    <option v-for="disciplina in disciplinas" :value="disciplina.id">{{
+                                        disciplina.disciplina }}
+                                    </option>
+                                </select>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+        </form>
+    </section>
 </template>
+
 <script lang="ts">
 import Disciplina from '@/models/Disciplina';
 import Grade from '@/models/Grade';
@@ -69,9 +75,9 @@ export default defineComponent({
         edicao: boolean,
     } {
         return {
-            apiGrade: process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_API_GRADE, 
-            apiDisciplina: process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_API_DISCIPLINA, 
-            apiAula: process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_API_AULA, 
+            apiGrade: process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_API_GRADE,
+            apiDisciplina: process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_API_DISCIPLINA,
+            apiAula: process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_API_AULA,
             disciplinas: [],
             grade: new Grade(),
             aulasDb: [],
@@ -100,7 +106,7 @@ export default defineComponent({
         },
         persistir() {
 
-        }, 
+        },
         async obterDadosIniciais() {
             let pDisciplina = this.axios.get<Disciplina[]>(this.apiDisciplina);
             let pGrade = this.axios.get<Grade>(this.apiGrade);

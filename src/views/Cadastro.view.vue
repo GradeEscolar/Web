@@ -1,23 +1,26 @@
 <template>
-    <section>
+    <section class="form">
         <form @submit.prevent="cadastrarUsuario">
-            <label for="nome">Nome</label><br />
-            <input type="text" id="nome" v-model="usuario.nome" /><br />
-            <br />
-            <label for="email">E-Mail</label><br />
-            <input type="email" id="email" v-model="usuario.email" /><br />
-            <br />
-            <label for="email">Senha</label><br />
-            <input type="password" id="senha" v-model="usuario.senha" /><br />
-            <br />
-            <button type="submit">Enviar</button><br />
-            <br />
-            <mark v-if="submitResult">{{ submitResult }}</mark>
+            <div class="field">
+                <label for="nome">Nome</label>
+                <input type="text" id="nome" v-model="usuario.nome" :pattern="nomePattern.source" />
+            </div>
+            
+            <div class="field">
+                <label for="email">E-Mail</label>
+                <input type="email" id="email" v-model="usuario.email" :pattern="emailPattern.source" autocomplete="email" />
+            </div>
+            
+            <div class="field">
+                <label for="email">Senha</label>
+                <input type="password" id="senha" v-model="usuario.senha" :pattern="senhaPattern.source" autocomplete="new-password"/>
+            </div>
+            
+            <div class="button">
+                <button type="submit" :disabled="!formValido">Cadastrar</button>
+                <mark v-if="submitResult">{{ submitResult }}</mark>
+            </div>
         </form>
-    </section>
-    <br />
-    <section>
-        <tabela-usuarios :usuarios="usuarios" />
     </section>
 </template>
 
@@ -33,16 +36,35 @@ export default defineComponent({
         TabelaUsuarios
     },
     data(): {
-        usuario: Usuario;
-        usuarios: Usuario[];
-        apiUsuario: string;
-        submitResult: string | undefined;
+        usuario: Usuario,
+        usuarios: Usuario[],
+        apiUsuario: string,
+        submitResult: string | undefined,
+        nomePattern: RegExp,
+        emailPattern: RegExp,
+        senhaPattern: RegExp
     } {
         return {
             usuario: new Usuario(),
             usuarios: new Array<Usuario>(),
             apiUsuario: process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_API_USUARIO,
-            submitResult: undefined
+            submitResult: undefined,
+            nomePattern: new RegExp('.{4,}'),
+            emailPattern: new RegExp('[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$'),
+            senhaPattern: new RegExp('.{4,}')
+        }
+    },
+
+    computed: {
+        formValido() {
+            if (!this.usuario.email || !this.usuario.senha || !this.usuario.nome){
+                return false;
+            }
+
+            let nomeValido = this.nomePattern.test(this.usuario.nome);
+            let emailValido = this.emailPattern.test(this.usuario.email);
+            let senhaValida = this.senhaPattern.test(this.usuario.senha);
+            return nomeValido && emailValido && senhaValida;
         }
     },
     emits: ['goToPage'],
