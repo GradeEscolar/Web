@@ -1,27 +1,25 @@
 <template>
-    <div class="formFix">
-        <section class="form">
-            <form @submit.prevent="submit()" @reset.prevent="reset()">
+    <section class="form">
+        <form @submit.prevent="submit()" @reset.prevent="reset()">
 
-                <div class="field">
-                    <label for="disciplina">Disciplina</label>
-                    <input type="text" id="disciplina" v-model="disciplina.disciplina" />
-                </div>
+            <div class="field">
+                <label for="disciplina">Disciplina</label>
+                <input type="text" id="disciplina" v-model="disciplina.disciplina" autofocus ref="disciplinaInput" />
+            </div>
 
-                <div class="button">
-                    <span v-if="!disciplinaSelecionada">
-                        <button type="submit" id="add" :disabled="!formValido">Incluir</button>
-                    </span>
-                    <span v-else>
-                        <button type="submit" id="upd" :disabled="!formValido">Salvar</button>
-                        <button type="button" id="del" @click="del()">Excluir</button>
-                        <button type="reset" id="abt">Cancelar</button>
-                    </span>
-                    <mark class="error" v-if="result">{{ result }}</mark>
-                </div>
-            </form>
-        </section>
-    </div>
+            <div class="button">
+                <span v-if="!disciplinaSelecionada">
+                    <button type="submit" id="add" :disabled="!formValido">Incluir</button>
+                </span>
+                <span v-else>
+                    <button type="submit" id="upd" :disabled="!formValido">Salvar</button>
+                    <button type="button" id="del" @click="del()">Excluir</button>
+                    <button type="reset" id="abt">Cancelar</button>
+                </span>
+                <mark class="error" v-if="result">{{ result }}</mark>
+            </div>
+        </form>
+    </section>
 
     <section class="table">
         <table>
@@ -81,6 +79,11 @@ export default defineComponent({
             this.disciplina = new Disciplina();
             this.disciplinaSelecionada = undefined;
             this.result = undefined;
+            this.focus();
+        },
+        focus() {
+            let input = this.$refs.disciplinaInput as HTMLInputElement;
+            input.focus();
         },
         async submit() {
 
@@ -95,18 +98,16 @@ export default defineComponent({
                 else
                     await this.axios.patch(this.api.disciplina, this.disciplina);
 
-                await this.obter();
-
+                await this.obter();                
             } catch (error: any) {
-                console.log(error);
                 let response = error.response.data as DefaultResponse;
-                console.log(response.message);
                 this.result = response.message;
             }
         },
         reset() {
             this.disciplina = new Disciplina();
             this.disciplinaSelecionada = undefined;
+            this.focus();
         },
         async del() {
             try {
@@ -120,6 +121,7 @@ export default defineComponent({
         selecionar(disciplina: Disciplina) {
             this.disciplinaSelecionada = Disciplina.clone(disciplina)
             this.disciplina = this.disciplinaSelecionada
+            this.focus();
         },
         disciplinaAtiva(disciplina: Disciplina): boolean {
             return this.disciplinaSelecionada?.id == disciplina.id;
@@ -133,13 +135,11 @@ export default defineComponent({
 </script>
 
 <style scoped>
-div.formFix {
+section.form {
     position: sticky;
-    top: var(--header-height);
+    top: 0;
     background-color: white;
     border-bottom: 1px solid var(--menu-border-color);
     box-shadow: 0 0 2px 2px white;
 }
-
-
 </style>

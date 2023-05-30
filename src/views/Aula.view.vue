@@ -3,7 +3,7 @@
         <form>
             <div class="field">
                 <label for="data">Data</label>
-                <input id="data" type="date" v-model="data" @change="selecionarData()" required />
+                <input id="data" type="date" v-model="data" @change="selecionarData()" required ref="data" />
             </div>
         </form>
     </section>
@@ -32,8 +32,8 @@
 
         </section>
 
-        <AnotacaoViewComponent @editando="editando" :anotacao="anotacao" :disciplina="obterDisciplina(aula?.id_disciplina)" exibir-titulos>
-        </AnotacaoViewComponent>
+        <AnotacaoComponent @editando="editando" :anotacao="anotacao" :disciplina="obterDisciplina(aula?.id_disciplina)" exibir-titulos>
+        </AnotacaoComponent>
     </span>
 </template>
 
@@ -46,14 +46,14 @@ import Aula from '@/models/Aula';
 import { defineComponent } from 'vue';
 import Api from '@/api/Api';
 import Dia from '@/models/Dia';
-import AnotacaoViewComponent from '@/components/anotacao_view.component.vue';
+import AnotacaoComponent from '@/components/anotacao.component.vue';
 
 
 export default defineComponent({
     name: 'AulaView',
 
     components: {
-        AnotacaoViewComponent
+        AnotacaoComponent
     },
 
     data(): {
@@ -88,8 +88,6 @@ export default defineComponent({
         },
         async editando(editando: boolean) {
             this.$emit('hideBackButton', editando);
-            // if(!editando)
-            //     await this.selecionarAula(true);
         },
         async selecionarData(fromSession: boolean = false) {
             if (this.data) {
@@ -124,6 +122,7 @@ export default defineComponent({
                 this.aula = undefined;
                 this.anotacao = undefined;
             }
+            this.focus();
         },
         async setAula(aula: Aula) {
             this.aula = aula;
@@ -138,6 +137,10 @@ export default defineComponent({
         },
         aulaAtiva(aula: number | undefined) {
             return this.aula?.aula == aula;
+        },
+        focus() {
+            let data = this.$refs.data as HTMLInputElement;
+            data.focus();
         }
     },
 

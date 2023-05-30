@@ -34,7 +34,7 @@
             </div>
 
             <div v-if="edit && !preview" class="conteudo_edit">
-                <textarea v-model.trim="conteudo_edit" autofocus></textarea>
+                <textarea v-model.trim="conteudo_edit" autofocus ref="ta"></textarea>
                 <span class="lnk" @click="help = !help">Como formatar esta anotação?</span>
                 <span class="help" v-if="help">
                         <br />
@@ -57,7 +57,7 @@
                 </span>
             </div>
             <div v-if="!edit || preview" class="conteudo_view" :class="{ borda: exibirTitulos, preview: preview }">
-                <span v-html="conteudo_view" :class="{ sem_anotacao: anotacao?.anotacao == undefined }"></span>
+                <span v-html="conteudo_view" :class="{ sem_anotacao: conteudo_view == '-- sem anotação --' }"></span>
             </div>
         </div>
     </section>
@@ -72,7 +72,7 @@ import Api from '@/api/Api';
 
 
 export default defineComponent({
-    name: 'AnotacaoViewComponent',
+    name: 'AnotacaoComponent',
 
     props: {
         anotacao: Anotacao,
@@ -138,18 +138,11 @@ export default defineComponent({
             this.preview = !this.preview;
             if (this.preview)
                 this.conteudo_view = this.conteudo_edit == undefined || this.conteudo_edit == '' ? '-- sem anotação --' : this.md.render(this.conteudo_edit);
-
         },
         async salvar() {
-            console.log(this.anotacao!.data);
             this.anotacao!.anotacao = this.conteudo_edit;
-            console.log(this.anotacao);
             let anotacao_db = await this.api.salvarAnotacao(this.anotacao!);
-            console.log(this.anotacao!.id);
-            console.log(anotacao_db.id);
-            console.log(anotacao_db);
             this.anotacao!.id = anotacao_db.id;
-            console.log(this.anotacao!.id);
             this.definirEdit(false);
         }
     },
@@ -275,7 +268,7 @@ textarea {
     height: 350px;
     border: 1px solid var(--input-border-color);
     border-radius: 5px;
-    padding: 6
+    padding: 6px;
 }
 
 span.help {

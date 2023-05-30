@@ -31,8 +31,8 @@
     </section>
 
     <span v-for="anotacao in anotacoes">
-        <AnotacaoViewComponent :anotacao="anotacao" :disciplina="disciplina?.disciplina" :exibir-titulos="exibirTitulos">
-        </AnotacaoViewComponent>
+        <AnotacaoComponent :anotacao="anotacao" :disciplina="disciplina?.disciplina" :exibir-titulos="exibirTitulos">
+        </AnotacaoComponent>
     </span>
 </template>
 
@@ -44,13 +44,13 @@ import Dia from '@/models/Dia';
 import Disciplina from '@/models/Disciplina';
 import { defineComponent } from 'vue';
 import MarkdownIt from 'markdown-it';
-import AnotacaoViewComponent from '@/components/anotacao_view.component.vue';
+import AnotacaoComponent from '@/components/anotacao.component.vue';
 
 export default defineComponent({
     name: 'AnotacoesView',
 
     components: {
-        AnotacaoViewComponent
+        AnotacaoComponent
     },
 
     data(): {
