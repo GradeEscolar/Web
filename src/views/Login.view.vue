@@ -3,13 +3,14 @@
         <form @submit.prevent="signIn()">
             <div class="field">
                 <label for="email">E-Mail</label>
-                <input type="email" id="email" v-model="usuario.email"
-                    :pattern="emailPattern.source" autocomplete="email" />
+                <input type="email" id="email" v-model="usuario.email" :pattern="emailPattern.source"
+                    autocomplete="email" />
             </div>
 
             <div class="field">
                 <label for="email">Senha</label>
-                <input type="password" id="senha" v-model="usuario.senha" :pattern="senhaPattern.source" autocomplete="current-password" />
+                <input type="password" id="senha" v-model="usuario.senha" :pattern="senhaPattern.source"
+                    autocomplete="current-password" />
             </div>
 
             <div class="button">
@@ -21,12 +22,20 @@
     </section>
 
     <p>
-        sem cadastro?<br />
-        <div @click="goToPage('Cadastro')">
-            <i class="pi pi-id-card"></i>
-            cadastre-se aqui.
-        </div>
+        se ainda não possui cadastro...<br />
+    <div @click="goToPage('Cadastro')">
+        <i class="pi pi-id-card"></i>
+        cadastre-se aqui.
+    </div>
 
+    </p>
+
+    <p>
+        se não quer se cadastrar...<br />
+    <div @click="acessoLocal()">
+        <i class="pi pi-arrow-circle-down"></i>
+        acesso local.
+    </div>
     </p>
 </template>
 
@@ -36,6 +45,7 @@ import Usuario from '@/models/Usuario';
 import TokenResponse from '@/api/TokenResponse'
 import DefaultResponse from '@/api/DefaultResponse';
 import Api from '@/api/Api';
+import DataContext from '@/data_access/DataContext';
 
 export default defineComponent({
     name: 'LoginView',
@@ -58,13 +68,13 @@ export default defineComponent({
 
     computed: {
         formValido() {
-            if (!this.usuario.email || !this.usuario.senha){
+            if (!this.usuario.email || !this.usuario.senha) {
                 return false;
             }
 
             let emailValido = this.emailPattern.test(this.usuario.email);
             let senhaValida = this.senhaPattern.test(this.usuario.senha);
-            
+
             return emailValido && senhaValida;
         }
     },
@@ -88,9 +98,13 @@ export default defineComponent({
                 let response = error.response.data as DefaultResponse;
                 this.result = response.message;
             }
+        },
+
+        acessoLocal() {
+            localStorage.setItem('access_token', 'local_access');
+            this.goToPage('Menu');
         }
     }
-
 })
 </script>
 <style scoped>

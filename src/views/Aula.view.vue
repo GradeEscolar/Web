@@ -145,7 +145,12 @@ export default defineComponent({
     },
 
     async mounted() {
-        if (!Auth.autenticado()) {
+        try {
+            const autenticado = await Auth.autenticado();
+            if (!autenticado)
+                throw new Error("Falha de autenticação.");
+        } catch (error) {
+            console.log(error);
             this.goToPage('Home');
             return;
         }

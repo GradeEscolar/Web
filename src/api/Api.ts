@@ -30,7 +30,7 @@ export default class Api {
 
     async obterDisciplinas(): Promise<Disciplina[]> {
         let response = await this.axios.get<Disciplina[]>(this.disciplina)
-        return Promise.resolve(Disciplina.sort(response.data));
+        return response.data;
     }
 
     async obterGradeDisciplinas(): Promise<[Grade, Disciplina[]]> {
