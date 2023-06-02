@@ -3,13 +3,13 @@
         <form @submit.prevent="signIn()">
             <div class="field">
                 <label for="email">E-Mail</label>
-                <input type="email" id="email" v-model="usuario.email" :pattern="emailPattern.source"
+                <input type="email" id="email" v-model="usuario.email" 
                     autocomplete="email" />
             </div>
 
             <div class="field">
                 <label for="email">Senha</label>
-                <input type="password" id="senha" v-model="usuario.senha" :pattern="senhaPattern.source"
+                <input type="password" id="senha" v-model="usuario.senha" 
                     autocomplete="current-password" />
             </div>
 
@@ -43,9 +43,7 @@
 import { defineComponent } from 'vue';
 import Usuario from '@/models/Usuario';
 import TokenResponse from '@/api/TokenResponse'
-import DefaultResponse from '@/api/DefaultResponse';
 import Api from '@/api/Api';
-import DataContext from '@/data_access/DataContext';
 
 export default defineComponent({
     name: 'LoginView',
@@ -95,8 +93,7 @@ export default defineComponent({
                 this.goToPage('Menu');
             }
             catch (error: any) {
-                let response = error.response.data as DefaultResponse;
-                this.result = response.message;
+                this.result = error ?? 'Houve uma falha no servidor.';
             }
         },
 

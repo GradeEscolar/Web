@@ -131,18 +131,24 @@ export default defineComponent({
 
         return config;
       },
-      error => Promise.reject(error)
+      error => {
+        Promise.reject(error);
+      } 
     )
 
     this.axios.interceptors.response.use(
       value => value,
       error => {
-        if (error.response.status == 422 || error.response.status == 401) {
+        if(!error.response){
+          this.goToPage('Login');
+          return Promise.reject((error?.message ?? "Api Inativa!") + ' 😩');
+        } else if (error.response?.status == 422 || error.response?.status == 401) {
           localStorage.removeItem('access_token');
-          this.goToPage('Login')
+          this.goToPage('Login');
+          return Promise.reject("Acesso não permitido!" + ' 🚫');
         }
 
-        return Promise.reject(error);
+        return Promise.reject(error?.response?.data?.message);
       }
     )
   },

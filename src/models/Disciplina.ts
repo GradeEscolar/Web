@@ -1,6 +1,6 @@
-import BaseModel from "./BaseModel";
+import IModel from "./IModel";
 
-export default class Disciplina implements BaseModel {
+export default class Disciplina implements IModel {
     id: number | undefined;
     id_usuario: number | undefined;
     disciplina: string | undefined;

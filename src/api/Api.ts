@@ -15,8 +15,8 @@ export default class Api {
 
     constructor(axios: AxiosStatic) {
         this.axios = axios;
-        this.usuario = process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_API_USUARIO;
-        this.login = process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_API_LOGIN;
+        this.usuario = process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_USUARIOS;
+        this.login = process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_LOGIN_API;
         this.disciplina = process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_API_DISCIPLINA;
         this.grade = process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_API_GRADE;
         this.aula = process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_API_AULA;

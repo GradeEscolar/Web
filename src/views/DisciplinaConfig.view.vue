@@ -36,7 +36,6 @@
 import { defineComponent } from 'vue';
 import Disciplina from '@/models/Disciplina'
 import DefaultResponse from '@/api/DefaultResponse';
-import Api from '@/api/Api';
 import DisciplinaService from '@/services/DisciplinaService';
 import Auth from '@/api/Auth';
 
@@ -44,7 +43,6 @@ export default defineComponent({
     name: 'DisciplinaConfigComponent',
 
     data(): {
-        api: Api,
         service: DisciplinaService,
         result: string | undefined,
         disciplina: Disciplina,
@@ -52,8 +50,7 @@ export default defineComponent({
         disciplinas: Disciplina[] | undefined
     } {
         return {
-            api: new Api(this.axios),
-            service: new DisciplinaService(this.axios),
+            service: new DisciplinaService(),
             result: undefined,
             disciplina: new Disciplina(),
             disciplinaSelecionada: undefined,
@@ -79,7 +76,7 @@ export default defineComponent({
         },
         async obter() {
             try {
-                this.disciplinas = await this.service.read();
+                this.disciplinas = await this.service.read<Disciplina>();
             } catch (error: any) {
                 this.result = "Houve uma falha ao obter as disciplinas.";
                 this.disciplinas = new Array<Disciplina>();
@@ -120,7 +117,7 @@ export default defineComponent({
         },
         async del() {
             try {
-                await this.axios.delete(`${this.api.disciplina}/${this.disciplina.id}`);
+                await this.service.delete(this.disciplina);
                 await this.obter();
             } catch (error: any) {
                 let response = error.response.data as DefaultResponse;
@@ -138,16 +135,11 @@ export default defineComponent({
     },
 
     async mounted() {
-        try {
-            const autenticado = await Auth.autenticado();
-            if (!autenticado)
-                throw new Error("Falha de autenticação.");
-        } catch (error) {
-            console.log(error);
+        if (!Auth.autenticado || !(await this.service.config(this.axios))){
             this.goToPage('Home');
             return;
         }
-
+        
         await this.obter();
     }
 })

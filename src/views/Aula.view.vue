@@ -145,12 +145,7 @@ export default defineComponent({
     },
 
     async mounted() {
-        try {
-            const autenticado = await Auth.autenticado();
-            if (!autenticado)
-                throw new Error("Falha de autenticação.");
-        } catch (error) {
-            console.log(error);
+        if (!Auth.autenticado) {
             this.goToPage('Home');
             return;
         }

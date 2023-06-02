@@ -1,19 +1,30 @@
-import DataContext from "@/data_access/DataContext";
-import Disciplina from "@/models/Disciplina";
 import { AxiosStatic } from "axios";
+import DataAccessConfig from "@/data_access/DataAccessConfig";
+import Disciplina from "@/models/Disciplina";
+import IRepository from "@/repositories/IRepository";
+import RepositoryFactory from "@/repositories/RepositoryFactory";
+import IModel from "@/models/IModel";
 
 export default class DisciplinaService {
-    private api: string;
-    private tabela: string;
-    private axios: AxiosStatic;
-    private dataContext: DataContext;
-    private get acessoLocal(): boolean { return DataContext.acessoLocal; };
 
-    constructor(axios: AxiosStatic) {
-        this.axios = axios;
-        this.api = process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_API_DISCIPLINA;
-        this.dataContext = new DataContext();
-        this.tabela = 'disciplinas';
+    private _repository: IRepository | undefined;
+    private get repository(): IRepository {
+        return this._repository!;
+    }
+
+    private _tabela: string | undefined;
+    private get tabela(): string {
+        return this._tabela!;
+    }
+
+    async config(axios: AxiosStatic): Promise<boolean> {
+        try {
+            this._repository = await RepositoryFactory.CreateRepository(axios);
+            this._tabela = this._repository.acessoLocal ? DataAccessConfig.disciplinas : `${DataAccessConfig.api}${DataAccessConfig.disciplinas}`;
+            return true;
+        } catch (error) {
+            return false;
+        }
     }
 
     sort(disciplinas: Disciplina[]): Disciplina[] {
@@ -33,30 +44,20 @@ export default class DisciplinaService {
         return clone;
     }
 
-    async create(disciplina: Disciplina) {
-        console.log(disciplina);
-        if (this.acessoLocal)
-            await this.dataContext.add(this.tabela, disciplina);
-        else
-            await this.axios.post(this.api, disciplina);
+    create(disciplina: Disciplina) {
+        return this.repository.create(this.tabela, disciplina);
     }
 
-    async read(): Promise<Disciplina[]> {
-        let result = this.acessoLocal
-            ? await this.dataContext.getAll<Disciplina>(this.tabela)
-            : (await this.axios.get<Disciplina[]>(this.api)).data;
-
-        return this.sort(result);
+    read<T extends IModel>() {
+        return this.repository.read<T>(this.tabela);
     }
 
-    async update(disciplina: Disciplina) {
-        this.acessoLocal
-            ? await this.dataContext.update(this.tabela, disciplina)
-            : await this.axios.patch(this.api, disciplina);
+    update(disciplina: Disciplina) {
+        return this.repository.update(this.tabela, disciplina);
     }
 
-    async delete(disciplina: Disciplina) {
-        throw new Error("");
+    delete(disciplina: Disciplina) {
+        return this.repository.delete(this.tabela, disciplina);
     }
 
 
