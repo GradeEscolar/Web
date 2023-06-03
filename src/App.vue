@@ -36,7 +36,7 @@
       </div>
 
       <div v-if="page == 'GradeConfig'">
-        <GradeConfigView />
+        <GradeConfigView @go-to-page="goToPage" />
       </div>
 
       <div v-if="page == 'AulaConfig'">

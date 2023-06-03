@@ -2,6 +2,7 @@ import IDataContext from "./IDataContext";
 import BaseDataContext from "./BaseDataContext";
 import DataAccessConfig from "./DataAccessConfig";
 import { AxiosStatic } from "axios";
+import GradeService from "@/services/GradeService";
 
 export default class DbDataContext extends BaseDataContext implements IDataContext {
     private static source: IDBDatabase | undefined = undefined;
@@ -19,8 +20,9 @@ export default class DbDataContext extends BaseDataContext implements IDataConte
         request.onupgradeneeded = this.upgradeneeded;
 
         return new Promise<void>((ok, err) => {
-            request.onsuccess = function () {
+            request.onsuccess = async function () {
                 DbDataContext.source = this.result;
+                await GradeService.initialize(this.result);
                 ok();
             };
             request.onerror = function () {
@@ -34,7 +36,7 @@ export default class DbDataContext extends BaseDataContext implements IDataConte
     private upgradeneeded(this: IDBOpenDBRequest) {
         const db = this.result;
         const objectStoreNames: string[] = [DataAccessConfig.grade, DataAccessConfig.disciplinas, DataAccessConfig.anotacoes, DataAccessConfig.aulas];
-        objectStoreNames.forEach(objectStoreName => {
+        objectStoreNames.forEach(async objectStoreName => {
             if (!db.objectStoreNames.contains(objectStoreName))
                 db.createObjectStore(objectStoreName, { autoIncrement: true, keyPath: "id" });
         });
