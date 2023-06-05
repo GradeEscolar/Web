@@ -39,12 +39,12 @@
 <script lang="ts">
 import Api from '@/api/Api';
 import Auth from '@/api/Auth';
-import Anotacao from '@/models/Anotacao';
-import Dia from '@/models/Dia';
-import Disciplina from '@/models/Disciplina';
+import Anotacao from '@/Models/Anotacao';
+import Dia from '@/Models/Dia';
 import { defineComponent } from 'vue';
 import MarkdownIt from 'markdown-it';
-import AnotacaoComponent from '@/components/anotacao.component.vue';
+import Disciplina from '@/Models/Disciplina';
+import AnotacaoComponent from '@/Pages/Components/Anotacao.vue';
 
 export default defineComponent({
     name: 'AnotacoesView',

@@ -52,20 +52,27 @@
 </template>
 
 <script lang="ts">
-import Disciplina from '@/models/Disciplina';
-import Grade from '@/models/Grade';
-import Dia from '@/models/Dia';
-import Aula from '@/models/Aula';
+import Grade from '@/Models/Grade';
+import Dia from '@/Models/Dia';
+import Aula from '@/Models/Aula';
 import { defineComponent } from 'vue';
 import DefaultResponse from '@/api/DefaultResponse';
+import Disciplina from '@/Models/Disciplina';
+// import DisciplinaService from '@/services/DisciplinaService';
+// import GradeService from '@/services/GradeService';
+// import AulaService from '@/services/AulaService';
+// import Auth from '@/api/Auth';
 
 export default defineComponent({
-    name: "AulaConfigComponent",
+    name: "AulaConfigView",
 
     data(): {
         apiGrade: string,
         apiDisciplina: string,
         apiAula: string,
+        // disciplinaService: DisciplinaService,
+        // gradeService: GradeService,
+        // aulaService: AulaService,
         disciplinas: Disciplina[],
         grade: Grade,
         aulasDb: Aula[],
@@ -75,9 +82,12 @@ export default defineComponent({
         edicao: boolean,
     } {
         return {
-            apiGrade: process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_API_GRADE,
-            apiDisciplina: process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_API_DISCIPLINA,
-            apiAula: process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_API_AULA,
+            apiGrade: process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_GRADE,
+            apiDisciplina: process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_DISCIPLINAS,
+            apiAula: process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_AULAS,
+            // disciplinaService: new DisciplinaService(),
+            // gradeService: new GradeService(),
+            // aulaService: new AulaService,
             disciplinas: [],
             grade: new Grade(),
             aulasDb: [],
@@ -88,7 +98,12 @@ export default defineComponent({
         }
     },
 
+    emits: ['goToPage'],
+
     methods: {
+        goToPage(page: string) {
+            this.$emit('goToPage', page);
+        },
         editar() {
             this.edicao = true;
         },
@@ -109,14 +124,14 @@ export default defineComponent({
         },
         async obterDadosIniciais() {
             let pDisciplina = this.axios.get<Disciplina[]>(this.apiDisciplina);
-            let pGrade = this.axios.get<Grade>(this.apiGrade);
-            let [rDisciplina, rGrade] = await Promise.all([pDisciplina, pGrade]);
+            let pGrades = this.axios.get<Grade[]>(this.apiGrade);
+            let [rDisciplina, rGrades] = await Promise.all([pDisciplina, pGrades]);
             this.disciplinas = rDisciplina.data;
-            this.grade = rGrade.data;
+            this.grade = rGrades.data[0];
         },
         async obterDados() {
             let aulaPesquisa = new Aula();
-            aulaPesquisa.id_grade = this.grade.id;
+            aulaPesquisa.id_grade = this.grade.id!;
             aulaPesquisa.dia = this.dia ?? Number(this.grade.dias.substring(0, 1))
             this.dia = aulaPesquisa.dia;
             let aulaResponse = await this.axios.post<Aula[]>(this.apiAula, aulaPesquisa);
@@ -126,6 +141,11 @@ export default defineComponent({
     },
 
     async mounted() {
+        // if (!Auth.autenticado || !(await this.service.config(this.axios))){
+        //     this.goToPage('Home');
+        //     return;
+        // }
+
         await this.obterDadosIniciais();
         await this.obterDados();
     },

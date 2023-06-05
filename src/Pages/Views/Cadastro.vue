@@ -3,17 +3,17 @@
         <form @submit.prevent="cadastrarUsuario">
             <div class="field">
                 <label for="nome">Nome</label>
-                <input type="text" id="nome" v-model="usuario.nome" :pattern="nomePattern.source" />
+                <input type="text" id="nome" v-model="usuario.nome" />
             </div>
             
             <div class="field">
                 <label for="email">E-Mail</label>
-                <input type="email" id="email" v-model="usuario.email" :pattern="emailPattern.source" autocomplete="email" />
+                <input type="email" id="email" v-model="usuario.email" autocomplete="email" />
             </div>
             
             <div class="field">
                 <label for="email">Senha</label>
-                <input type="password" id="senha" v-model="usuario.senha" :pattern="senhaPattern.source" autocomplete="new-password"/>
+                <input type="password" id="senha" v-model="usuario.senha" autocomplete="new-password"/>
             </div>
             
             <div class="button">
@@ -26,32 +26,27 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import Usuario from '@/models/Usuario';
-import DefaultResponse from '@/api/DefaultResponse';
-import TabelaUsuarios from '@/components/TabelaUsuarios.vue';
+import Usuario from '@/Models/Usuario';
+import UsuarioService from '@/Services/UsuarioService';
 
 export default defineComponent({
     name: 'CadastroView',
-    components: {
-        TabelaUsuarios
-    },
+
     data(): {
+        service: UsuarioService,
         usuario: Usuario,
-        usuarios: Usuario[],
-        apiUsuario: string,
         submitResult: string | undefined,
         nomePattern: RegExp,
         emailPattern: RegExp,
         senhaPattern: RegExp
     } {
         return {
+            service: new UsuarioService(this.axios),
             usuario: new Usuario(),
-            usuarios: new Array<Usuario>(),
-            apiUsuario: process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_API_USUARIO,
             submitResult: undefined,
-            nomePattern: new RegExp('.{4,}'),
-            emailPattern: new RegExp('[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$'),
-            senhaPattern: new RegExp('.{4,}')
+            nomePattern: /.{4,}/,
+            emailPattern: /[a-z0-9._%+-]+@[a-z0-9.-]+.[a-z]{2,4}$/,
+            senhaPattern: /.{4,}/
         }
     },
 
@@ -76,23 +71,14 @@ export default defineComponent({
             this.submitResult = undefined;
             this.usuario.id = undefined;
             try {
-                let response = await this.axios.post<DefaultResponse>(this.apiUsuario, this.usuario);
+                await this.service.cadastrar(this.usuario);
                 this.usuario = new Usuario();
-                this.usuarios = await this.obterUsuarios();
                 this.submitResult = "Ok!";
             }
             catch (error: any) {
-                let response = error.response.data as DefaultResponse;
-                this.submitResult = response.message;
+                this.submitResult = error ?? 'Falha ao cadastrar usuário!';
             }
-        },
-        async obterUsuarios() {
-            let response = await this.axios.get<Usuario[]>(this.apiUsuario);
-            return response.data;
         }
-    },
-    async mounted() {
-        this.usuarios = await this.obterUsuarios();
     }
 });
 </script>

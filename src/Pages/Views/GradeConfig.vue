@@ -29,16 +29,15 @@
 </template>
 
 <script lang="ts">
-import DefaultResponse from '@/api/DefaultResponse';
-import Grade from '@/models/Grade';
-import Dia from '@/models/Dia';
+import Grade from '@/Models/Grade';
+import Dia from '@/Models/Dia';
 import { defineComponent } from 'vue';
 import Api from '@/api/Api';
-import GradeService from '@/services/GradeService';
 import Auth from '@/api/Auth';
+import GradeService from '@/Services/GradeService';
 
 export default defineComponent({
-    name: "GradeConfigComponent",
+    name: "GradeConfigView",
 
     data(): {
         api: Api,
@@ -72,11 +71,11 @@ export default defineComponent({
         async persistirGrade() {
             this.grade.dias = Dia.desmontar(this.dias);
             this.grade.aulas = this.aulas;
-            await this.service.atualizarGrade(this.grade);
+            await this.service.atualizar(this.grade);
             this.result = "Grade salva!";
         },
         async obterGrade() {
-            this.grade = await this.service.obterGrade();
+            this.grade = await this.service.obter();
             this.lerGrade();
             this.hasData = true;
         },

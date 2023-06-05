@@ -1,30 +1,12 @@
 import { AxiosStatic } from "axios";
-import DataAccessConfig from "@/data_access/DataAccessConfig";
-import Disciplina from "@/models/Disciplina";
-import IRepository from "@/repositories/IRepository";
-import RepositoryFactory from "@/repositories/RepositoryFactory";
-import IModel from "@/models/IModel";
+import Disciplina from "@/Models/Disciplina";
+import IDisciplinaRepository, { DisciplinaRepositoryFactory } from "@/Repositories/DisciplinaRepository";
+import BaseService from "./BaseService";
 
-export default class DisciplinaService {
-
-    private _repository: IRepository | undefined;
-    private get repository(): IRepository {
-        return this._repository!;
-    }
-
-    private _tabela: string | undefined;
-    private get tabela(): string {
-        return this._tabela!;
-    }
+export default class DisciplinaService extends BaseService<IDisciplinaRepository> {
 
     async config(axios: AxiosStatic): Promise<boolean> {
-        try {
-            this._repository = await RepositoryFactory.CreateRepository(axios);
-            this._tabela = this._repository.acessoLocal ? DataAccessConfig.disciplinas : `${DataAccessConfig.api}${DataAccessConfig.disciplinas}`;
-            return true;
-        } catch (error) {
-            return false;
-        }
+        return this.baseConfig(axios, DisciplinaRepositoryFactory.CreateRepository);
     }
 
     sort(disciplinas: Disciplina[]): Disciplina[] {
@@ -44,21 +26,19 @@ export default class DisciplinaService {
         return clone;
     }
 
-    create(disciplina: Disciplina) {
-        return this.repository.create(this.tabela, disciplina);
+    criar(disciplina: Disciplina) {
+        return this.repository.criar(disciplina);
     }
 
-    read<T extends IModel>() {
-        return this.repository.read<T>(this.tabela);
+    obter() {
+        return this.repository.obter();
     }
 
-    update(disciplina: Disciplina) {
-        return this.repository.update(this.tabela, disciplina);
+    atualizar(disciplina: Disciplina) {
+        return this.repository.atualizar(disciplina);
     }
 
-    delete(disciplina: Disciplina) {
-        return this.repository.delete(this.tabela, disciplina);
+    excluir(disciplina: Disciplina) {
+        return this.repository.excluir(disciplina);
     }
-
-
 }

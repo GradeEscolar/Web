@@ -1,8 +1,8 @@
 import { AxiosStatic } from "axios";
-import Grade from "@/models/Grade";
-import Disciplina from "@/models/Disciplina";
-import Aula from "@/models/Aula";
-import Anotacao from "@/models/Anotacao";
+import Grade from "@/Models/Grade";
+import Disciplina from "@/Models/Disciplina";
+import Aula from "@/Models/Aula";
+import Anotacao from "@/Models/Anotacao";
 
 export default class Api {
     private axios: AxiosStatic;

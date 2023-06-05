@@ -39,14 +39,14 @@
 
 <script lang="ts">
 import Auth from '@/api/Auth';
-import Anotacao from '@/models/Anotacao';
-import Disciplina from '@/models/Disciplina';
-import Grade from '@/models/Grade';
-import Aula from '@/models/Aula';
+import Anotacao from '@/Models/Anotacao';
+import Grade from '@/Models/Grade';
+import Aula from '@/Models/Aula';
 import { defineComponent } from 'vue';
 import Api from '@/api/Api';
-import Dia from '@/models/Dia';
-import AnotacaoComponent from '@/components/anotacao.component.vue';
+import Dia from '@/Models/Dia';
+import AnotacaoComponent from '@/Pages/Components/Anotacao.vue';
+import Disciplina from '@/Models/Disciplina';
 
 
 export default defineComponent({
@@ -101,7 +101,7 @@ export default defineComponent({
             }
         },
         async selecionarAula(fromSession: boolean = false) {
-            let aulas = await this.api.obterAulas(this.grade!.id, this.dia!.dia);
+            let aulas = await this.api.obterAulas(this.grade!.id!, this.dia!.dia);
             if (aulas)
                 aulas = Aula.sort(aulas);
             this.aulas = aulas?.length == 0 ? undefined : aulas;

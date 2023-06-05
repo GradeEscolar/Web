@@ -65,8 +65,8 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import Dia from '@/models/Dia';
-import Anotacao from '@/models/Anotacao';
+import Dia from '@/Models/Dia';
+import Anotacao from '@/Models/Anotacao';
 import MarkdownIt from 'markdown-it';
 import Api from '@/api/Api';
 

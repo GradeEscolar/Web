@@ -1,9 +1,8 @@
 import { AxiosStatic } from "axios";
-import BaseDataContext from "./BaseDataContext";
 import IDataContext from "./IDataContext";
 
-export default class ApiDataContext extends BaseDataContext implements IDataContext {
-    private static source: AxiosStatic | undefined;
+export default class ApiDataContext implements IDataContext {
+    private static source: AxiosStatic | undefined = undefined;
     private _axios: AxiosStatic;
 
     public get source(): IDBDatabase | AxiosStatic | undefined {
@@ -11,7 +10,6 @@ export default class ApiDataContext extends BaseDataContext implements IDataCont
     }
 
     constructor(axios: AxiosStatic) {
-        super();
         this._axios = axios;
     }
 

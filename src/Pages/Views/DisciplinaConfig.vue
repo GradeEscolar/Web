@@ -34,13 +34,13 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import Disciplina from '@/models/Disciplina'
+import Disciplina from '@/Models/Disciplina'
 import DefaultResponse from '@/api/DefaultResponse';
-import DisciplinaService from '@/services/DisciplinaService';
 import Auth from '@/api/Auth';
+import DisciplinaService from '@/Services/DisciplinaService';
 
 export default defineComponent({
-    name: 'DisciplinaConfigComponent',
+    name: 'DisciplinaConfigView',
 
     data(): {
         service: DisciplinaService,
@@ -76,7 +76,7 @@ export default defineComponent({
         },
         async obter() {
             try {
-                this.disciplinas = await this.service.read<Disciplina>();
+                this.disciplinas = await this.service.obter();
             } catch (error: any) {
                 this.result = "Houve uma falha ao obter as disciplinas.";
                 this.disciplinas = new Array<Disciplina>();
@@ -100,9 +100,9 @@ export default defineComponent({
 
             try {
                 if (!this.disciplinaSelecionada)
-                    await this.service.create(this.disciplina);
+                    await this.service.criar(this.disciplina);
                 else
-                    await this.service.update(this.disciplina);
+                    await this.service.atualizar(this.disciplina);
 
                 await this.obter();
             } catch (error: any) {
@@ -117,7 +117,7 @@ export default defineComponent({
         },
         async del() {
             try {
-                await this.service.delete(this.disciplina);
+                await this.service.excluir(this.disciplina);
                 await this.obter();
             } catch (error: any) {
                 let response = error.response.data as DefaultResponse;

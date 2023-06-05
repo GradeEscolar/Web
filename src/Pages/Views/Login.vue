@@ -41,22 +41,21 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import Usuario from '@/models/Usuario';
-import TokenResponse from '@/api/TokenResponse'
-import Api from '@/api/Api';
+import Usuario from '@/Models/Usuario';
+import LoginService from '@/Services/LoginService';
 
 export default defineComponent({
     name: 'LoginView',
 
     data(): {
-        api: Api,
+        service: LoginService,
         result: string | undefined,
         usuario: Usuario,
         emailPattern: RegExp,
         senhaPattern: RegExp
     } {
         return {
-            api: new Api(this.axios),
+            service: new LoginService(this.axios),
             result: undefined,
             usuario: new Usuario(),
             emailPattern: /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/,
@@ -87,9 +86,9 @@ export default defineComponent({
         async signIn() {
             try {
                 this.result = undefined;
-                let response = await this.axios.post<TokenResponse>(this.api.login, this.usuario);
+                let access_token = await this.service.login(this.usuario);
                 this.usuario = new Usuario();
-                localStorage.setItem('access_token', response.data.access_token);
+                localStorage.setItem('access_token', access_token);
                 this.goToPage('Menu');
             }
             catch (error: any) {

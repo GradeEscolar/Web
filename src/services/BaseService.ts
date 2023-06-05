@@ -1,13 +1,10 @@
 import { AxiosStatic } from "axios";
-import DataAccessConfig from "@/data_access/DataAccessConfig";
-import IRepository from "@/repositories/IRepository";
-import RepositoryFactory from "@/repositories/RepositoryFactory";
-import IModel from "@/models/IModel";
+import IModel from "@/Models/IModel";
 
-export default abstract class BaseService {
+export default abstract class BaseService<TIRepository> {
 
-    private _repository: IRepository | undefined;
-    protected get repository(): IRepository {
+    private _repository: TIRepository | undefined;
+    protected get repository(): TIRepository {
         return this._repository!;
     }
 
@@ -16,10 +13,9 @@ export default abstract class BaseService {
         return this._tabela!;
     }
 
-    protected async baseConfig(axios: AxiosStatic, tabela: string): Promise<boolean> {
+    protected async baseConfig(axios: AxiosStatic, createRepository: (axios: AxiosStatic) => Promise<TIRepository>): Promise<boolean> {
         try {
-            this._repository = await RepositoryFactory.CreateRepository(axios);
-            this._tabela = this._repository.acessoLocal ? tabela : `${DataAccessConfig.api}${tabela}`;
+            this._repository = await createRepository(axios);
             return true;
         } catch (error) {
             return false;

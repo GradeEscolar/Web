@@ -56,16 +56,16 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import HeaderComponent from './components/header.component.vue';
-import HomeView from './views/Home.view.vue';
-import LoginView from './views/Login.view.vue';
-import CadastroView from './views/Cadastro.view.vue';
-import MenuView from './views/Menu.view.vue';
-import AulaView from './views/Aula.view.vue';
-import AnotacoesView from './views/Anotacoes.view.vue';
-import DisciplinaConfigView from './views/DisciplinaConfig.view.vue';
-import GradeConfigView from './views/GradeConfig.view.vue';
-import AulaConfigView from './views/AulaConfig.view.vue';
+import HeaderComponent from './Pages/Components/Header.vue';
+import HomeView from './Pages/Views/Home.vue';
+import LoginView from './Pages/Views/Login.vue';
+import CadastroView from './Pages/Views/Cadastro.vue';
+import MenuView from './Pages/Views/Menu.vue';
+import AulaView from './Pages/Views/Aula.vue';
+import AnotacoesView from './Pages/Views/Anotacoes.vue';
+import DisciplinaConfigView from './Pages/Views/DisciplinaConfig.vue';
+import GradeConfigView from './Pages/Views/GradeConfig.vue';
+import AulaConfigView from './Pages/Views/AulaConfig.vue';
 
 export default defineComponent({
   name: 'App',
