@@ -52,20 +52,23 @@
 </template>
 
 <script lang="ts">
-import Disciplina from '@/models/Disciplina';
-import Grade from '@/models/Grade';
-import Dia from '@/models/Dia';
-import Aula from '@/models/Aula';
+import Grade from '@/Models/Grade';
+import Dia from '@/Models/Dia';
+import Aula from '@/Models/Aula';
 import { defineComponent } from 'vue';
-import DefaultResponse from '@/api/DefaultResponse';
+import Disciplina from '@/Models/Disciplina';
+import Auth from '@/api/Auth';
+import DisciplinaService from '@/Services/DisciplinaService';
+import GradeService from '@/Services/GradeService';
+import AulaService from '@/Services/AulaService';
 
 export default defineComponent({
-    name: "AulaConfigComponent",
+    name: "AulaConfigView",
 
     data(): {
-        apiGrade: string,
-        apiDisciplina: string,
-        apiAula: string,
+        disciplinaService: DisciplinaService,
+        gradeService: GradeService,
+        aulaService: AulaService,
         disciplinas: Disciplina[],
         grade: Grade,
         aulasDb: Aula[],
@@ -75,9 +78,9 @@ export default defineComponent({
         edicao: boolean,
     } {
         return {
-            apiGrade: process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_API_GRADE,
-            apiDisciplina: process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_API_DISCIPLINA,
-            apiAula: process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_API_AULA,
+            disciplinaService: new DisciplinaService(),
+            gradeService: new GradeService(),
+            aulaService: new AulaService(),
             disciplinas: [],
             grade: new Grade(),
             aulasDb: [],
@@ -88,12 +91,17 @@ export default defineComponent({
         }
     },
 
+    emits: ['goToPage'],
+
     methods: {
+        goToPage(page: string) {
+            this.$emit('goToPage', page);
+        },
         editar() {
             this.edicao = true;
         },
         async salvar() {
-            await this.axios.put<DefaultResponse>(this.apiAula, this.aulas);
+            await this.aulaService.salvar(this.aulas);
             this.edicao = false;
         },
         cancelar() {
@@ -104,28 +112,27 @@ export default defineComponent({
             this.dias = Dia.montarAtivos(this.grade.dias);
             this.aulas = Aula.montar(this.grade, this.aulasDb, this.dia!);
         },
-        persistir() {
-
-        },
         async obterDadosIniciais() {
-            let pDisciplina = this.axios.get<Disciplina[]>(this.apiDisciplina);
-            let pGrade = this.axios.get<Grade>(this.apiGrade);
-            let [rDisciplina, rGrade] = await Promise.all([pDisciplina, pGrade]);
-            this.disciplinas = rDisciplina.data;
-            this.grade = rGrade.data;
+            const disciplinaPromise = this.disciplinaService.obter();
+            const gradePromise = this.gradeService.obter();
+            const [disciplinas, grade] = await Promise.all([disciplinaPromise, gradePromise]);
+            this.disciplinas = disciplinas;
+            this.grade = grade;
         },
         async obterDados() {
-            let aulaPesquisa = new Aula();
-            aulaPesquisa.id_grade = this.grade.id;
-            aulaPesquisa.dia = this.dia ?? Number(this.grade.dias.substring(0, 1))
-            this.dia = aulaPesquisa.dia;
-            let aulaResponse = await this.axios.post<Aula[]>(this.apiAula, aulaPesquisa);
-            this.aulasDb = aulaResponse.data;
+            this.dia = this.dia ?? Number(this.grade.dias.substring(0, 1));
+            this.aulasDb = await this.aulaService.obter(this.grade.id, this.dia);
             this.ler();
         }
     },
 
     async mounted() {
+        if (!Auth.autenticado || !(await this.aulaService.config(this.axios))){
+            this.goToPage('Home');
+            return;
+        }
+        await this.gradeService.config(this.axios);
+        await this.disciplinaService.config(this.axios);
         await this.obterDadosIniciais();
         await this.obterDados();
     },

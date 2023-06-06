@@ -29,17 +29,17 @@
 </template>
 
 <script lang="ts">
-import DefaultResponse from '@/api/DefaultResponse';
-import Grade from '@/models/Grade';
-import Dia from '@/models/Dia';
+import Grade from '@/Models/Grade';
+import Dia from '@/Models/Dia';
 import { defineComponent } from 'vue';
-import Api from '@/api/Api';
+import Auth from '@/api/Auth';
+import GradeService from '@/Services/GradeService';
 
 export default defineComponent({
-    name: "GradeConfigComponent",
+    name: "GradeConfigView",
 
     data(): {
-        api: Api,
+        service: GradeService,
         hasData: boolean,
         grade: Grade,
         aulas: number,
@@ -47,7 +47,7 @@ export default defineComponent({
         result: string | undefined
     } {
         return {
-            api: new Api(this.axios),
+            service: new GradeService(),
             hasData: false,
             grade: new Grade(),
             aulas: 0,
@@ -55,8 +55,12 @@ export default defineComponent({
             result: undefined
         }
     },
+    emits: ['goToPage'],
 
     methods: {
+        goToPage(page: string) {
+            this.$emit('goToPage', page);
+        },
         lerGrade() {
             this.dias = Dia.montarTodos(this.grade.dias);
             this.aulas = this.grade.aulas
@@ -64,12 +68,11 @@ export default defineComponent({
         async persistirGrade() {
             this.grade.dias = Dia.desmontar(this.dias);
             this.grade.aulas = this.aulas;
-            await this.axios.patch<DefaultResponse>(this.api.grade, this.grade);
+            await this.service.atualizar(this.grade);
             this.result = "Grade salva!";
         },
         async obterGrade() {
-            let response = await this.axios.get<Grade>(this.api.grade);
-            this.grade = response.data;
+            this.grade = await this.service.obter();
             this.lerGrade();
             this.hasData = true;
         },
@@ -81,6 +84,12 @@ export default defineComponent({
     },
 
     async mounted() {
+        if (!Auth.autenticado || !(await this.service.config(this.axios))){
+            this.goToPage('Home');
+            return;
+        }
+
+
         await this.obterGrade();
     }
 })

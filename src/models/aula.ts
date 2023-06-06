@@ -1,6 +1,7 @@
 import Grade from "./Grade";
+import IModel from "./IModel";
 
-export default class Aula {
+export default class Aula implements IModel {
     id: number | undefined;
     id_grade: number = 0;
     id_disciplina: number | undefined;
@@ -24,7 +25,7 @@ export default class Aula {
             if (!novaAula) {
                 novaAula = {
                     id: undefined,
-                    id_grade: grade.id,
+                    id_grade: grade.id!,
                     aula: aula,
                     dia: dia,
                     id_disciplina: undefined
@@ -37,9 +38,5 @@ export default class Aula {
         return novasAulas;
     }
 
-    static sort(aulas: Aula[]): Aula[] {
-        return aulas.sort((a, b) => {
-            return a.aula - b.aula;
-        });
-    }
+    
 }

@@ -14,7 +14,7 @@
                 </div>
 
                 <div class="field" v-if="anotacoes?.length ?? 0 >= 1">
-                    <span>
+                    <span class="no-print">
                         <input type="checkbox" id="titulos" name="titulos" v-model="exibirTitulos" />
                         <label for="titulos">Exibir títulos</label>
                     </span>
@@ -37,14 +37,15 @@
 </template>
 
 <script lang="ts">
-import Api from '@/api/Api';
 import Auth from '@/api/Auth';
-import Anotacao from '@/models/Anotacao';
-import Dia from '@/models/Dia';
-import Disciplina from '@/models/Disciplina';
+import Anotacao from '@/Models/Anotacao';
+import Dia from '@/Models/Dia';
 import { defineComponent } from 'vue';
 import MarkdownIt from 'markdown-it';
-import AnotacaoComponent from '@/components/anotacao.component.vue';
+import Disciplina from '@/Models/Disciplina';
+import AnotacaoComponent from '@/Pages/Components/Anotacao.vue';
+import AnotacaoService from '@/Services/AnotacaoService';
+import DisciplinaService from '@/Services/DisciplinaService';
 
 export default defineComponent({
     name: 'AnotacoesView',
@@ -54,7 +55,8 @@ export default defineComponent({
     },
 
     data(): {
-        api: Api,
+        anotacaoService: AnotacaoService,
+        disciplinaService: DisciplinaService,
         disciplinas: Disciplina[] | undefined,
         disciplina: Disciplina | undefined,
         exibirTitulos: boolean,
@@ -63,7 +65,8 @@ export default defineComponent({
         md: MarkdownIt
     } {
         return {
-            api: new Api(this.axios),
+            anotacaoService: new AnotacaoService(),
+            disciplinaService: new DisciplinaService(),
             disciplinas: undefined,
             disciplina: undefined,
             exibirTitulos: true,
@@ -84,7 +87,7 @@ export default defineComponent({
             this.$emit('goToPage', page);
         },
         async obterDisciplinas() {
-            this.disciplinas = await this.api.obterDisciplinas();
+            this.disciplinas = await this.disciplinaService.obter();
             if (this.disciplinas) {
                 this.disciplina = this.disciplinas[0];
             }
@@ -94,7 +97,7 @@ export default defineComponent({
                 return;
             }
 
-            this.anotacoes = await this.api.obterAnotacoes(this.disciplina, this.mes);
+            this.anotacoes = await this.anotacaoService.obterAnotacoes(this.disciplina, this.mes);
         },
         obterTitulo(anotacao: Anotacao) {
             return `Aula ${anotacao.aula} - ${Dia.dataCompleta(new Date(anotacao.data))}.`;
@@ -108,11 +111,12 @@ export default defineComponent({
     },
 
     async mounted() {
-        if (!Auth.autenticado()) {
+        if (!Auth.autenticado || !(await this.anotacaoService.config(this.axios))) {
             this.goToPage('Home');
             return;
         }
 
+        await this.disciplinaService.config(this.axios);
         let exibirTitulos = localStorage.getItem('exibir_titulos');
         if (exibirTitulos) {
             this.exibirTitulos = exibirTitulos == 's';

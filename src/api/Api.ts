@@ -1,10 +1,10 @@
 import { AxiosStatic } from "axios";
-import Grade from "@/models/Grade";
-import Disciplina from "@/models/Disciplina";
-import Aula from "@/models/Aula";
-import Anotacao from "@/models/Anotacao";
+import Grade from "@/Models/Grade";
+import Disciplina from "@/Models/Disciplina";
+import Aula from "@/Models/Aula";
+import Anotacao from "@/Models/Anotacao";
 
-export default class Api {
+export default class Api___ {
     private axios: AxiosStatic;
     usuario: string;
     login: string;
@@ -15,8 +15,8 @@ export default class Api {
 
     constructor(axios: AxiosStatic) {
         this.axios = axios;
-        this.usuario = process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_API_USUARIO;
-        this.login = process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_API_LOGIN;
+        this.usuario = process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_USUARIOS;
+        this.login = process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_LOGIN_API;
         this.disciplina = process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_API_DISCIPLINA;
         this.grade = process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_API_GRADE;
         this.aula = process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_API_AULA;
@@ -30,7 +30,7 @@ export default class Api {
 
     async obterDisciplinas(): Promise<Disciplina[]> {
         let response = await this.axios.get<Disciplina[]>(this.disciplina)
-        return Promise.resolve(Disciplina.sort(response.data));
+        return response.data;
     }
 
     async obterGradeDisciplinas(): Promise<[Grade, Disciplina[]]> {

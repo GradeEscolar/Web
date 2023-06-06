@@ -34,22 +34,23 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import Disciplina from '@/models/Disciplina'
+import Disciplina from '@/Models/Disciplina'
 import DefaultResponse from '@/api/DefaultResponse';
-import Api from '@/api/Api';
+import Auth from '@/api/Auth';
+import DisciplinaService from '@/Services/DisciplinaService';
 
 export default defineComponent({
-    name: 'DisciplinaConfigComponent',
+    name: 'DisciplinaConfigView',
 
     data(): {
-        api: Api,
+        service: DisciplinaService,
         result: string | undefined,
         disciplina: Disciplina,
         disciplinaSelecionada: Disciplina | undefined,
         disciplinas: Disciplina[] | undefined
     } {
         return {
-            api: new Api(this.axios),
+            service: new DisciplinaService(),
             result: undefined,
             disciplina: new Disciplina(),
             disciplinaSelecionada: undefined,
@@ -67,12 +68,17 @@ export default defineComponent({
         }
     },
 
+    emits: ['goToPage'],
+
     methods: {
-        async obter(): Promise<void> {
+        goToPage(page: string) {
+            this.$emit('goToPage', page);
+        },
+        async obter() {
             try {
-                let response = await this.axios.get<Disciplina[]>(this.api.disciplina);
-                this.disciplinas = Disciplina.sort(response.data);
+                this.disciplinas = await this.service.obter();
             } catch (error: any) {
+                this.result = "Houve uma falha ao obter as disciplinas.";
                 this.disciplinas = new Array<Disciplina>();
             }
 
@@ -94,14 +100,14 @@ export default defineComponent({
 
             try {
                 if (!this.disciplinaSelecionada)
-                    await this.axios.post(this.api.disciplina, this.disciplina);
+                    await this.service.criar(this.disciplina);
                 else
-                    await this.axios.patch(this.api.disciplina, this.disciplina);
+                    await this.service.atualizar(this.disciplina);
 
-                await this.obter();                
+                await this.obter();
             } catch (error: any) {
-                let response = error.response.data as DefaultResponse;
-                this.result = response.message;
+                this.result = 'Ocorreu um erro ao salvar a disciplina.'
+                console.log(error);
             }
         },
         reset() {
@@ -111,7 +117,7 @@ export default defineComponent({
         },
         async del() {
             try {
-                await this.axios.delete(`${this.api.disciplina}/${this.disciplina.id}`);
+                await this.service.excluir(this.disciplina);
                 await this.obter();
             } catch (error: any) {
                 let response = error.response.data as DefaultResponse;
@@ -119,7 +125,7 @@ export default defineComponent({
             }
         },
         selecionar(disciplina: Disciplina) {
-            this.disciplinaSelecionada = Disciplina.clone(disciplina)
+            this.disciplinaSelecionada = this.service.clone(disciplina)
             this.disciplina = this.disciplinaSelecionada
             this.focus();
         },
@@ -129,6 +135,11 @@ export default defineComponent({
     },
 
     async mounted() {
+        if (!Auth.autenticado || !(await this.service.config(this.axios))){
+            this.goToPage('Home');
+            return;
+        }
+        
         await this.obter();
     }
 })

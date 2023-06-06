@@ -3,13 +3,14 @@
         <form @submit.prevent="signIn()">
             <div class="field">
                 <label for="email">E-Mail</label>
-                <input type="email" id="email" v-model="usuario.email"
-                    :pattern="emailPattern.source" autocomplete="email" />
+                <input type="email" id="email" v-model="usuario.email" 
+                    autocomplete="email" />
             </div>
 
             <div class="field">
                 <label for="email">Senha</label>
-                <input type="password" id="senha" v-model="usuario.senha" :pattern="senhaPattern.source" autocomplete="current-password" />
+                <input type="password" id="senha" v-model="usuario.senha" 
+                    autocomplete="current-password" />
             </div>
 
             <div class="button">
@@ -21,34 +22,40 @@
     </section>
 
     <p>
-        sem cadastro?<br />
-        <div @click="goToPage('Cadastro')">
-            <i class="pi pi-id-card"></i>
-            cadastre-se aqui.
-        </div>
+        se ainda não possui cadastro...<br />
+    <div @click="goToPage('Cadastro')">
+        <i class="pi pi-id-card"></i>
+        cadastre-se aqui.
+    </div>
 
+    </p>
+
+    <p>
+        se não quer se cadastrar...<br />
+    <div @click="acessoLocal()">
+        <i class="pi pi-arrow-circle-down"></i>
+        acesso local.
+    </div>
     </p>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import Usuario from '@/models/Usuario';
-import TokenResponse from '@/api/TokenResponse'
-import DefaultResponse from '@/api/DefaultResponse';
-import Api from '@/api/Api';
+import Usuario from '@/Models/Usuario';
+import LoginService from '@/Services/LoginService';
 
 export default defineComponent({
     name: 'LoginView',
 
     data(): {
-        api: Api,
+        service: LoginService,
         result: string | undefined,
         usuario: Usuario,
         emailPattern: RegExp,
         senhaPattern: RegExp
     } {
         return {
-            api: new Api(this.axios),
+            service: new LoginService(this.axios),
             result: undefined,
             usuario: new Usuario(),
             emailPattern: /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/,
@@ -58,13 +65,13 @@ export default defineComponent({
 
     computed: {
         formValido() {
-            if (!this.usuario.email || !this.usuario.senha){
+            if (!this.usuario.email || !this.usuario.senha) {
                 return false;
             }
 
             let emailValido = this.emailPattern.test(this.usuario.email);
             let senhaValida = this.senhaPattern.test(this.usuario.senha);
-            
+
             return emailValido && senhaValida;
         }
     },
@@ -79,18 +86,21 @@ export default defineComponent({
         async signIn() {
             try {
                 this.result = undefined;
-                let response = await this.axios.post<TokenResponse>(this.api.login, this.usuario);
+                let access_token = await this.service.login(this.usuario);
                 this.usuario = new Usuario();
-                localStorage.setItem('access_token', response.data.access_token);
+                localStorage.setItem('access_token', access_token);
                 this.goToPage('Menu');
             }
             catch (error: any) {
-                let response = error.response.data as DefaultResponse;
-                this.result = response.message;
+                this.result = error ?? 'Houve uma falha no servidor.';
             }
+        },
+
+        acessoLocal() {
+            localStorage.setItem('access_token', 'local_access');
+            this.goToPage('Menu');
         }
     }
-
 })
 </script>
 <style scoped>

@@ -72,9 +72,8 @@ export default defineComponent({
     },
 
     mounted() {
-        if (!Auth.autenticado()) {
+        if (!Auth.autenticado) {
             this.goToPage('Home');
-            return;
         }
     }
 
@@ -93,7 +92,8 @@ section {
     padding: 10px;
 }
 
-.lnk, .config {
+.lnk,
+.config {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -150,8 +150,8 @@ p {
 .submenu span:first-child {
     margin-left: 0;
 }
+
 .submenu span:last-child {
     margin-right: 0;
 }
-
 </style>

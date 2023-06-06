@@ -1,7 +1,7 @@
 <template>
     <div id="header">
         <div id="back" :style="{ visibility: back ? 'visible' : 'hidden' }" @click="goToPage(backTo)">
-            <i class="pi pi-chevron-left"></i>
+            <i class="no-print pi pi-chevron-left"></i>
         </div>
         <div id="icon">
             <i :class="icon"></i>
@@ -217,5 +217,11 @@ export default defineComponent({
 #login span,
 #sair span {
     font-size: 10pt;
+}
+
+@media print {
+  .no-print {
+    display: none;
+  }
 }
 </style>

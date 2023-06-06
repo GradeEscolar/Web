@@ -32,11 +32,11 @@
       </div>
 
       <div v-if="page == 'DisciplinaConfig'">
-        <DisciplinaConfigView />
+        <DisciplinaConfigView @go-to-page="goToPage" />
       </div>
 
       <div v-if="page == 'GradeConfig'">
-        <GradeConfigView />
+        <GradeConfigView @go-to-page="goToPage" />
       </div>
 
       <div v-if="page == 'AulaConfig'">
@@ -56,16 +56,16 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import HeaderComponent from './components/header.component.vue';
-import HomeView from './views/Home.view.vue';
-import LoginView from './views/Login.view.vue';
-import CadastroView from './views/Cadastro.view.vue';
-import MenuView from './views/Menu.view.vue';
-import AulaView from './views/Aula.view.vue';
-import AnotacoesView from './views/Anotacoes.view.vue';
-import DisciplinaConfigView from './views/DisciplinaConfig.view.vue';
-import GradeConfigView from './views/GradeConfig.view.vue';
-import AulaConfigView from './views/AulaConfig.view.vue';
+import HeaderComponent from './Pages/Components/Header.vue';
+import HomeView from './Pages/Views/Home.vue';
+import LoginView from './Pages/Views/Login.vue';
+import CadastroView from './Pages/Views/Cadastro.vue';
+import MenuView from './Pages/Views/Menu.vue';
+import AulaView from './Pages/Views/Aula.vue';
+import AnotacoesView from './Pages/Views/Anotacoes.vue';
+import DisciplinaConfigView from './Pages/Views/DisciplinaConfig.vue';
+import GradeConfigView from './Pages/Views/GradeConfig.vue';
+import AulaConfigView from './Pages/Views/AulaConfig.vue';
 
 export default defineComponent({
   name: 'App',
@@ -131,18 +131,24 @@ export default defineComponent({
 
         return config;
       },
-      error => Promise.reject(error)
+      error => {
+        Promise.reject(error);
+      } 
     )
 
     this.axios.interceptors.response.use(
       value => value,
       error => {
-        if (error.response.status == 422 || error.response.status == 401) {
+        if(!error.response){
+          this.goToPage('Login');
+          return Promise.reject((error?.message ?? "Api Inativa!") + ' 😩');
+        } else if (error.response?.status == 422 || error.response?.status == 401) {
           localStorage.removeItem('access_token');
-          this.goToPage('Login')
+          this.goToPage('Login');
+          return Promise.reject("Acesso não permitido!" + ' 🚫');
         }
 
-        return Promise.reject(error);
+        return Promise.reject(error?.response?.data?.message);
       }
     )
   },
@@ -424,4 +430,20 @@ tbody tr td select {
   font-weight: bold;
   background-color: var(--table-selected-backgroud-color);
 }
+
+
+/* Table */
+
+
+/* Print */
+
+@media print {
+  .no-print {
+    display: none;
+  }
+}
+
+/* print */
+
+
 </style>
