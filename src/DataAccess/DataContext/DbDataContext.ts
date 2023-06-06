@@ -10,9 +10,6 @@ export default class DbDataContext implements IDataContext {
         return DbDataContext.source;
     }
     
-    constructor() {
-    }
-    
     public config(): Promise<void> {
 
         if(DbDataContext.source)        
@@ -38,9 +35,18 @@ export default class DbDataContext implements IDataContext {
     private upgradeneeded(this: IDBOpenDBRequest) {
         const db = this.result;
         const objectStoreNames: string[] = [DataAccessConfig.gradeTable, DataAccessConfig.disciplinaTable, DataAccessConfig.anotacaoTable, DataAccessConfig.aulaTable];
-        objectStoreNames.forEach(async objectStoreName => {
-            if (!db.objectStoreNames.contains(objectStoreName))
+        objectStoreNames.forEach(objectStoreName => {
+            if (!db.objectStoreNames.contains(objectStoreName)){
                 db.createObjectStore(objectStoreName, { autoIncrement: true, keyPath: "id" });
+            }
+
+            if(objectStoreName ==  DataAccessConfig.aulaTable.toString()){
+                const transaction = this.transaction!;
+                const objectStore = transaction.objectStore(objectStoreName);
+                if(!objectStore.indexNames.contains('dia')){
+                    objectStore.createIndex('dia', 'dia', { unique: false });
+                }
+            }
         });
     }
 

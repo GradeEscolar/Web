@@ -58,10 +58,10 @@ import Aula from '@/Models/Aula';
 import { defineComponent } from 'vue';
 import DefaultResponse from '@/api/DefaultResponse';
 import Disciplina from '@/Models/Disciplina';
-// import DisciplinaService from '@/services/DisciplinaService';
-// import GradeService from '@/services/GradeService';
-// import AulaService from '@/services/AulaService';
-// import Auth from '@/api/Auth';
+import Auth from '@/api/Auth';
+import DisciplinaService from '@/Services/DisciplinaService';
+import GradeService from '@/Services/GradeService';
+import AulaService from '@/Services/AulaService';
 
 export default defineComponent({
     name: "AulaConfigView",
@@ -70,9 +70,10 @@ export default defineComponent({
         apiGrade: string,
         apiDisciplina: string,
         apiAula: string,
-        // disciplinaService: DisciplinaService,
-        // gradeService: GradeService,
-        // aulaService: AulaService,
+
+        disciplinaService: DisciplinaService,
+        gradeService: GradeService,
+        aulaService: AulaService,
         disciplinas: Disciplina[],
         grade: Grade,
         aulasDb: Aula[],
@@ -85,9 +86,10 @@ export default defineComponent({
             apiGrade: process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_GRADE,
             apiDisciplina: process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_DISCIPLINAS,
             apiAula: process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_AULAS,
-            // disciplinaService: new DisciplinaService(),
-            // gradeService: new GradeService(),
-            // aulaService: new AulaService,
+
+            disciplinaService: new DisciplinaService(),
+            gradeService: new GradeService(),
+            aulaService: new AulaService,
             disciplinas: [],
             grade: new Grade(),
             aulasDb: [],
@@ -108,7 +110,7 @@ export default defineComponent({
             this.edicao = true;
         },
         async salvar() {
-            await this.axios.put<DefaultResponse>(this.apiAula, this.aulas);
+            await this.aulaService.salvar(this.aulas);
             this.edicao = false;
         },
         cancelar() {
@@ -119,33 +121,27 @@ export default defineComponent({
             this.dias = Dia.montarAtivos(this.grade.dias);
             this.aulas = Aula.montar(this.grade, this.aulasDb, this.dia!);
         },
-        persistir() {
-
-        },
         async obterDadosIniciais() {
-            let pDisciplina = this.axios.get<Disciplina[]>(this.apiDisciplina);
-            let pGrades = this.axios.get<Grade[]>(this.apiGrade);
-            let [rDisciplina, rGrades] = await Promise.all([pDisciplina, pGrades]);
-            this.disciplinas = rDisciplina.data;
-            this.grade = rGrades.data[0];
+            const disciplinaPromise = this.disciplinaService.obter();
+            const gradePromise = this.gradeService.obter();
+            const [disciplinas, grade] = await Promise.all([disciplinaPromise, gradePromise]);
+            this.disciplinas = disciplinas;
+            this.grade = grade;
         },
         async obterDados() {
-            let aulaPesquisa = new Aula();
-            aulaPesquisa.id_grade = this.grade.id!;
-            aulaPesquisa.dia = this.dia ?? Number(this.grade.dias.substring(0, 1))
-            this.dia = aulaPesquisa.dia;
-            let aulaResponse = await this.axios.post<Aula[]>(this.apiAula, aulaPesquisa);
-            this.aulasDb = aulaResponse.data;
+            this.dia = this.dia ?? Number(this.grade.dias.substring(0, 1));
+            this.aulasDb = await this.aulaService.obter(this.grade.id, this.dia);
             this.ler();
         }
     },
 
     async mounted() {
-        // if (!Auth.autenticado || !(await this.service.config(this.axios))){
-        //     this.goToPage('Home');
-        //     return;
-        // }
-
+        if (!Auth.autenticado || !(await this.aulaService.config(this.axios))){
+            this.goToPage('Home');
+            return;
+        }
+        await this.gradeService.config(this.axios);
+        await this.disciplinaService.config(this.axios);
         await this.obterDadosIniciais();
         await this.obterDados();
     },
