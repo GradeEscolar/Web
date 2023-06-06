@@ -15,26 +15,26 @@
                     </span>
 
                     <span class="lnk" @click="definirEdit(true)" v-if="!edit">
-                        <p>Editar</p>
+                        <p class="no-print">Editar</p>
                     </span>
 
                     <span class="lnk" @click="alternarPreview()" v-if="edit">
-                        <p>{{ preview ? 'Editar' : 'Visualizar' }}</p>
+                        <p class="no-print">{{ preview ? 'Editar' : 'Visualizar' }}</p>
                     </span>
                     <span v-if="edit">|</span>
                     <span class="lnk" v-if="edit" @click="salvar()">
-                        <p>Salvar</p>
+                        <p class="no-print">Salvar</p>
                     </span>
                     <span v-if="edit">|</span>
                     <span class="lnk" @click="definirEdit(false)" v-if="edit">
-                        <p>Cancelar</p>
+                        <p class="no-print">Cancelar</p>
                     </span>
                 </span>
 
             </div>
 
             <div v-if="edit && !preview" class="conteudo_edit">
-                <textarea v-model.trim="conteudo_edit" autofocus ref="ta"></textarea>
+                <textarea id="conteudo" v-model.trim="conteudo_edit" autofocus ref="ta"></textarea>
                 <span class="lnk" @click="help = !help">Como formatar esta anotação?</span>
                 <span class="help" v-if="help">
                         <br />
@@ -68,7 +68,7 @@ import { defineComponent } from 'vue';
 import Dia from '@/Models/Dia';
 import Anotacao from '@/Models/Anotacao';
 import MarkdownIt from 'markdown-it';
-import Api from '@/api/Api';
+import AnotacaoService from '@/Services/AnotacaoService';
 
 
 export default defineComponent({
@@ -81,7 +81,7 @@ export default defineComponent({
     },
 
     data(): {
-        api: Api,
+        service: AnotacaoService,
         edit: boolean,
         preview: boolean,
         dataCompleta: string | undefined,
@@ -91,7 +91,7 @@ export default defineComponent({
         md: MarkdownIt
     } {
         return {
-            api: new Api(this.axios),
+            service: new AnotacaoService(),
             edit: false,
             preview: false,
             dataCompleta: undefined,
@@ -141,13 +141,14 @@ export default defineComponent({
         },
         async salvar() {
             this.anotacao!.anotacao = this.conteudo_edit;
-            let anotacao_db = await this.api.salvarAnotacao(this.anotacao!);
+            let anotacao_db = await this.service.salvarAnotacao(this.anotacao!);
             this.anotacao!.id = anotacao_db.id;
             this.definirEdit(false);
         }
     },
 
-    mounted() {
+    async mounted() {
+        await this.service.config(this.axios);
         this.definirDataCompleta(this.anotacao);
         this.definirConteudo(this.anotacao);
     },
@@ -275,4 +276,9 @@ span.help {
     padding: 5px 0 60px 10px;
 }
 
+@media print {
+  .no-print {
+    display: none;
+  }
+}
 </style>

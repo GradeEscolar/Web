@@ -38,9 +38,5 @@ export default class Aula implements IModel {
         return novasAulas;
     }
 
-    static sort(aulas: Aula[]): Aula[] {
-        return aulas.sort((a, b) => {
-            return a.aula - b.aula;
-        });
-    }
+    
 }

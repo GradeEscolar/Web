@@ -21,4 +21,10 @@ export default class AulaService extends BaseService<IAulaRepository> {
         return this.repository.salvar(aulas);
     }
 
+    sort(aulas: Aula[]): Aula[] {
+        return aulas.sort((a, b) => {
+            return a.aula - b.aula;
+        });
+    }
+
 }

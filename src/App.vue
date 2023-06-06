@@ -430,4 +430,20 @@ tbody tr td select {
   font-weight: bold;
   background-color: var(--table-selected-backgroud-color);
 }
+
+
+/* Table */
+
+
+/* Print */
+
+@media print {
+  .no-print {
+    display: none;
+  }
+}
+
+/* print */
+
+
 </style>

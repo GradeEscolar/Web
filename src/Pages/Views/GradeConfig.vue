@@ -32,7 +32,6 @@
 import Grade from '@/Models/Grade';
 import Dia from '@/Models/Dia';
 import { defineComponent } from 'vue';
-import Api from '@/api/Api';
 import Auth from '@/api/Auth';
 import GradeService from '@/Services/GradeService';
 
@@ -40,7 +39,6 @@ export default defineComponent({
     name: "GradeConfigView",
 
     data(): {
-        api: Api,
         service: GradeService,
         hasData: boolean,
         grade: Grade,
@@ -49,7 +47,6 @@ export default defineComponent({
         result: string | undefined
     } {
         return {
-            api: new Api(this.axios),
             service: new GradeService(),
             hasData: false,
             grade: new Grade(),

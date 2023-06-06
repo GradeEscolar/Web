@@ -56,7 +56,6 @@ import Grade from '@/Models/Grade';
 import Dia from '@/Models/Dia';
 import Aula from '@/Models/Aula';
 import { defineComponent } from 'vue';
-import DefaultResponse from '@/api/DefaultResponse';
 import Disciplina from '@/Models/Disciplina';
 import Auth from '@/api/Auth';
 import DisciplinaService from '@/Services/DisciplinaService';
@@ -67,10 +66,6 @@ export default defineComponent({
     name: "AulaConfigView",
 
     data(): {
-        apiGrade: string,
-        apiDisciplina: string,
-        apiAula: string,
-
         disciplinaService: DisciplinaService,
         gradeService: GradeService,
         aulaService: AulaService,
@@ -83,13 +78,9 @@ export default defineComponent({
         edicao: boolean,
     } {
         return {
-            apiGrade: process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_GRADE,
-            apiDisciplina: process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_DISCIPLINAS,
-            apiAula: process.env.VUE_APP_GE_API + process.env.VUE_APP_GE_AULAS,
-
             disciplinaService: new DisciplinaService(),
             gradeService: new GradeService(),
-            aulaService: new AulaService,
+            aulaService: new AulaService(),
             disciplinas: [],
             grade: new Grade(),
             aulasDb: [],

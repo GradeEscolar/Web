@@ -5,16 +5,16 @@ import Grade from "@/Models/Grade";
 
 export default class DbDataContext implements IDataContext {
     private static source: IDBDatabase | undefined = undefined;
-    
+
     public get source(): IDBDatabase | AxiosStatic | undefined {
         return DbDataContext.source;
     }
-    
+
     public config(): Promise<void> {
 
-        if(DbDataContext.source)        
+        if (DbDataContext.source)
             return new Promise(ok => ok());
-        
+
         const request = window.indexedDB.open(DataAccessConfig.db, 1);
         request.onupgradeneeded = this.upgradeneeded;
 
@@ -36,15 +36,26 @@ export default class DbDataContext implements IDataContext {
         const db = this.result;
         const objectStoreNames: string[] = [DataAccessConfig.gradeTable, DataAccessConfig.disciplinaTable, DataAccessConfig.anotacaoTable, DataAccessConfig.aulaTable];
         objectStoreNames.forEach(objectStoreName => {
-            if (!db.objectStoreNames.contains(objectStoreName)){
+            if (!db.objectStoreNames.contains(objectStoreName)) {
                 db.createObjectStore(objectStoreName, { autoIncrement: true, keyPath: "id" });
             }
 
-            if(objectStoreName ==  DataAccessConfig.aulaTable.toString()){
+            if (objectStoreName == DataAccessConfig.aulaTable.toString()) {
                 const transaction = this.transaction!;
                 const objectStore = transaction.objectStore(objectStoreName);
-                if(!objectStore.indexNames.contains('dia')){
+                if (!objectStore.indexNames.contains('dia')) {
                     objectStore.createIndex('dia', 'dia', { unique: false });
+                }
+            }
+
+            if (objectStoreName == DataAccessConfig.anotacaoTable.toString()) {
+                const transaction = this.transaction!;
+                const objectStore = transaction.objectStore(objectStoreName);
+                if (!objectStore.indexNames.contains('grade')) {
+                    objectStore.createIndex('grade', ['aula', 'id_disciplina', 'data'], { unique: true });
+                }
+                if (!objectStore.indexNames.contains('disciplina')) {
+                    objectStore.createIndex('disciplina', ['id_disciplina', 'data'], { unique: false });
                 }
             }
         });

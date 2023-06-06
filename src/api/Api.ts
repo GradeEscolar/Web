@@ -4,7 +4,7 @@ import Disciplina from "@/Models/Disciplina";
 import Aula from "@/Models/Aula";
 import Anotacao from "@/Models/Anotacao";
 
-export default class Api {
+export default class Api___ {
     private axios: AxiosStatic;
     usuario: string;
     login: string;
