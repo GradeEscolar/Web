@@ -198,7 +198,7 @@ export default defineComponent({
   --font-family: 'Didact Gothic', sans-serif;
   --blockquote-background-color: rgb(230, 230, 255);
   --blockquote-border-color: rgb(130, 130, 255);
-  --evento-background-color: rgb(255, 200, 200);
+  --evento-background-color: rgb(255, 225, 225);
   --evento-border-color: rgb(155, 100, 100);
   --evento-color: rgb(55, 0, 0);
 
