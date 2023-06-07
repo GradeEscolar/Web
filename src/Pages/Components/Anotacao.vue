@@ -39,25 +39,15 @@
                 <span class="mk" v-if="help">
                     <br />
                     <br />
-                    As anotações utilizam o padrão de formatação <a
-                        href="https://www.google.com/search?q=markdown+basic+syntax" target="_blank" class="lnk"
-                        style="margin: 0;">Markdown</a><br />
-                    veja alguns exemplos:
+                    Adicione os caracteres especiais #, *, >, ~ e - ao seu texto da forma como é apresentado abaixo:
                     <br />
                     <br />
                     <h3>### Eventos (provas, entrega de trabalhos, etc...)</h3>
                     <h1># Título</h1>
                     <h2>## Subtítulo</h2>
-                    <p>Parágrafo (enter)</p>
-                    <p>Parágrafo (shift+enter)<br />
-                        Parágrafo</p>
-                    <p>Texto em **<strong>Negrito</strong>**, *<em>Itálico</em>*, <s>Tachado</s>.</p>
+                    <p>Texto em **<strong>Negrito</strong>**, *<em>Itálico</em>*, ~~<s>Tachado</s>~~.</p>
                     <blockquote>
-                        <p>&gt; Citação (enter)</p>
-                    </blockquote>
-                    <blockquote>
-                        <p>&gt; Citação (shift+enter)<br />
-                            Citação</p>
+                        <p>&gt; Citação</p>
                     </blockquote>
                     <ul>
                         <li>- Lista</li>
@@ -65,6 +55,9 @@
                     </ul>
                     <p>--- Linha divisória</p>
                     <hr />
+                    <br />
+                    <br />
+                    <br />
                     <br />
                     <br />
                 </span>
@@ -152,7 +145,6 @@ export default defineComponent({
             this.preview = !this.preview;
             if (this.preview) {
                 const conteudo = this.conteudo_edit == undefined || this.conteudo_edit == '' ? '-- sem anotação --' : this.md.render(this.conteudo_edit);
-                console.log(conteudo)
                 this.conteudo_view = conteudo;
             }
         },
