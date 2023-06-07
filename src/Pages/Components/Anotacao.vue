@@ -36,28 +36,42 @@
             <div v-if="edit && !preview" class="conteudo_edit">
                 <textarea id="conteudo" v-model.trim="conteudo_edit" autofocus ref="ta"></textarea>
                 <span class="lnk" @click="help = !help">Como formatar esta anotação?</span>
-                <span class="help" v-if="help">
-                        <br />
-                        <br />
-                        As anotações utilizam o padrão de formatação <a href="https://www.google.com/search?q=markdown+basic+syntax" target="_blank" class="lnk" style="margin: 0;">Markdown</a><br />
-                        veja alguns exemplos:
-                        <br />
-                        <br />
-                        <strong># Título 1</strong><br />
-                        <b>## Título 2</b><br />
-                        &nbsp;&nbsp;&nbsp;&nbsp;> Indentação 1<br />
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;>> Indentação 2<br />
-                        
-                        <b>**Negrito**</b><br />
-                        <span style="font-style: italic;">*itálico*</span><br />
-                        * Lista - Item 1<br />
-                        * Lista - Item 2<br />
-                        --- linha horizontal<br />
-                        <hr style="size: 1px" />
+                <span class="mk" v-if="help">
+                    <br />
+                    <br />
+                    As anotações utilizam o padrão de formatação <a
+                        href="https://www.google.com/search?q=markdown+basic+syntax" target="_blank" class="lnk"
+                        style="margin: 0;">Markdown</a><br />
+                    veja alguns exemplos:
+                    <br />
+                    <br />
+                    <h3>### Eventos (provas, entrega de trabalhos, etc...)</h3>
+                    <h1># Título</h1>
+                    <h2>## Subtítulo</h2>
+                    <p>Parágrafo (enter)</p>
+                    <p>Parágrafo (shift+enter)<br />
+                        Parágrafo</p>
+                    <p>Texto em **<strong>Negrito</strong>**, *<em>Itálico</em>*, <s>Tachado</s>.</p>
+                    <blockquote>
+                        <p>&gt; Citação (enter)</p>
+                    </blockquote>
+                    <blockquote>
+                        <p>&gt; Citação (shift+enter)<br />
+                            Citação</p>
+                    </blockquote>
+                    <ul>
+                        <li>- Lista</li>
+                        <li>- Lista</li>
+                    </ul>
+                    <p>--- Linha divisória</p>
+                    <hr />
+                    <br />
+                    <br />
                 </span>
             </div>
             <div v-if="!edit || preview" class="conteudo_view" :class="{ borda: exibirTitulos, preview: preview }">
-                <span v-html="conteudo_view" :class="{ sem_anotacao: conteudo_view == '-- sem anotação --' }"></span>
+                <span v-html="conteudo_view" class="mk"
+                    :class="{ sem_anotacao: conteudo_view == '-- sem anotação --' }"></span>
             </div>
         </div>
     </section>
@@ -136,8 +150,11 @@ export default defineComponent({
         },
         alternarPreview() {
             this.preview = !this.preview;
-            if (this.preview)
-                this.conteudo_view = this.conteudo_edit == undefined || this.conteudo_edit == '' ? '-- sem anotação --' : this.md.render(this.conteudo_edit);
+            if (this.preview) {
+                const conteudo = this.conteudo_edit == undefined || this.conteudo_edit == '' ? '-- sem anotação --' : this.md.render(this.conteudo_edit);
+                console.log(conteudo)
+                this.conteudo_view = conteudo;
+            }
         },
         async salvar() {
             this.anotacao!.anotacao = this.conteudo_edit;
@@ -277,8 +294,7 @@ span.help {
 }
 
 @media print {
-  .no-print {
-    display: none;
-  }
-}
-</style>
+    .no-print {
+        display: none;
+    }
+}</style>
