@@ -49,7 +49,7 @@
 
   <footer>
     <p>
-      Grade Escolar 2023 - v 1.0
+      Grade Escolar 2023 - v 1.1
     </p>
   </footer>
 </template>
@@ -196,16 +196,13 @@ export default defineComponent({
   --info-border-color: rgb(0, 60, 155);
   --info-background-color: rgb(240, 250, 255);
   --font-family: 'Didact Gothic', sans-serif;
-
   --blockquote-background-color: rgb(230, 230, 255);
   --blockquote-border-color: rgb(130, 130, 255);
-  
   --evento-background-color: rgb(255, 200, 200);
   --evento-border-color: rgb(155, 100, 100);
   --evento-color: rgb(55, 0, 0);
 
 }
-
 
 /* markdown */
 
