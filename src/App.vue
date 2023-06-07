@@ -196,7 +196,62 @@ export default defineComponent({
   --info-border-color: rgb(0, 60, 155);
   --info-background-color: rgb(240, 250, 255);
   --font-family: 'Didact Gothic', sans-serif;
+
+  --blockquote-background-color: rgb(230, 230, 255);
+  --blockquote-border-color: rgb(130, 130, 255);
+  
+  --evento-background-color: rgb(255, 200, 200);
+  --evento-border-color: rgb(155, 100, 100);
+  --evento-color: rgb(55, 0, 0);
+
 }
+
+
+/* markdown */
+
+.mk {
+  font-family: var(--font-family);
+  font-size: 10pt;
+}
+
+.mk h1, .mk h2, .mk h3, .mk h4, .mk h5, .mk h6 {
+  padding: 0 0 2px 5px;
+  margin: 4px 0 4px 0;  
+  border-bottom: 1px solid var(--input-border-color);
+}
+
+.mk h1 { font-size: 14pt;}
+.mk h2 { font-size: 12pt;}
+.mk h3 { 
+  font-size: 13pt; 
+  color: var(--evento-color); 
+  background-color: var(--evento-background-color);
+  border: 1px solid var(--evento-border-color); 
+  border-radius: 5px;
+  text-align: center;
+  padding: 5px;
+  margin: 10px 5px 5px 10px;
+}
+.mk h4 { font-size: 11pt;}
+.mk h5 { font-size: 11pt;}
+.mk h6 { font-size: 11pt;}
+
+.mk blockquote {
+  padding: 5px;
+  margin: 10px 5px 5px 10px;
+}
+
+.mk blockquote p {
+  margin: 0 0 0 0;
+  padding: 5px;
+  background-color: var( --blockquote-background-color);
+  border-left: 3px solid  var( --blockquote-border-color);
+  border-radius: 2px;
+  font-size: 11pt;
+}
+
+/* markdown */
+
 
 html {
   font-family: var(--font-family);
