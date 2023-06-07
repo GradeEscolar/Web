@@ -67,6 +67,10 @@
                     <hr />
                     <br />
                     <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
                 </span>
             </div>
             <div v-if="!edit || preview" class="conteudo_view" :class="{ borda: exibirTitulos, preview: preview }">
