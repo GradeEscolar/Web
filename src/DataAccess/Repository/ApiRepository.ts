@@ -71,7 +71,7 @@ export default abstract class ApiRepository<T extends IModel> extends ApiDataCon
     delete(model: T): Promise<void> {
         return new Promise<void>(async (ok, err) => {
             try {
-                await this.axios.patch<void>(`${this.url}/${model.id}`);
+                await this.axios.delete<void>(`${this.url}/${model.id}`);
                 ok();
             } catch (error: any) {
                 console.log(error);
