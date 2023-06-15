@@ -1,13 +1,13 @@
 import { AxiosStatic } from "axios";
-import ApiRepository from "@/DataAccess/Repository/ApiRepository";
 import Usuario from "@/Models/Usuario";
-import DataAccessConfig from "@/DataAccess/DataAccessConfig";
-import TokenResponse from "@/api/TokenResponse";
+import RepositoryBase from "@/DataAccess/RepositoryBase";
+import AppConfig from "@/AppConfig";
+import TokenResponse from "@/Models/TokenResponse";
 
-export default class LoginRepository extends ApiRepository<Usuario> {
+export default class LoginRepository extends RepositoryBase<Usuario> {
     
     constructor(axios: AxiosStatic) {
-        super(axios, DataAccessConfig.loginUrl);
+        super(AppConfig.loginUrl, axios);
     }
 
     login(usuario: Usuario): Promise<TokenResponse> {

@@ -98,7 +98,7 @@ export default defineComponent({
         md: MarkdownIt
     } {
         return {
-            service: new AnotacaoService(),
+            service: new AnotacaoService(this.axios),
             edit: false,
             preview: false,
             dataCompleta: undefined,
@@ -157,7 +157,6 @@ export default defineComponent({
     },
 
     async mounted() {
-        await this.service.config(this.axios);
         this.definirDataCompleta(this.anotacao);
         this.definirConteudo(this.anotacao);
     },

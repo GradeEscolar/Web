@@ -1,12 +1,12 @@
 import { AxiosStatic } from "axios";
 import Disciplina from "@/Models/Disciplina";
-import IDisciplinaRepository, { DisciplinaRepositoryFactory } from "@/Repositories/DisciplinaRepository";
-import BaseService from "./BaseService";
+import DisciplinaRepository from "@/Repositories/DisciplinaRepository";
+import ServiceBase from "@/DataAccess/ServiceBase";
 
-export default class DisciplinaService extends BaseService<IDisciplinaRepository> {
+export default class DisciplinaService extends ServiceBase<DisciplinaRepository> {
 
-    async config(axios: AxiosStatic): Promise<boolean> {
-        return this.baseConfig(axios, DisciplinaRepositoryFactory.CreateRepository);
+    constructor(axios: AxiosStatic) {
+        super(() => new DisciplinaRepository(axios));
     }
 
     sort(disciplinas: Disciplina[]): Disciplina[] {

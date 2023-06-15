@@ -40,7 +40,7 @@
       </div>
 
       <div v-if="page == 'AulaConfig'">
-        <AulaConfigView />
+        <AulaConfigView @go-to-page="goToPage" />
       </div>
 
     </section>
@@ -49,7 +49,7 @@
 
   <footer>
     <p>
-      Grade Escolar 2023 - v 1.1
+      Grade Escolar 2023 - v 1.0
     </p>
   </footer>
 </template>

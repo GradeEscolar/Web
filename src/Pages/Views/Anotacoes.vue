@@ -37,7 +37,7 @@
 </template>
 
 <script lang="ts">
-import Auth from '@/api/Auth';
+import AuthService from '@/Services/AuthService';
 import Anotacao from '@/Models/Anotacao';
 import Dia from '@/Models/Dia';
 import { defineComponent } from 'vue';
@@ -65,8 +65,8 @@ export default defineComponent({
         md: MarkdownIt
     } {
         return {
-            anotacaoService: new AnotacaoService(),
-            disciplinaService: new DisciplinaService(),
+            anotacaoService: new AnotacaoService(this.axios),
+            disciplinaService: new DisciplinaService(this.axios),
             disciplinas: undefined,
             disciplina: undefined,
             exibirTitulos: true,
@@ -111,12 +111,11 @@ export default defineComponent({
     },
 
     async mounted() {
-        if (!Auth.autenticado || !(await this.anotacaoService.config(this.axios))) {
+        if (!AuthService.autenticado) {
             this.goToPage('Home');
             return;
         }
 
-        await this.disciplinaService.config(this.axios);
         let exibirTitulos = localStorage.getItem('exibir_titulos');
         if (exibirTitulos) {
             this.exibirTitulos = exibirTitulos == 's';

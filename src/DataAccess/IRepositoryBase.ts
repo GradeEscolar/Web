@@ -1,8 +1,6 @@
 import IModel from "@/Models/IModel";
 
 export default interface IRepository<T extends IModel> {
-    config(): Promise<void> | void;
-    get acessoLocal(): boolean;
     get(): Promise<T[]>;
     post(model: T): Promise<T[]>;
     put(model: T): Promise<void>;

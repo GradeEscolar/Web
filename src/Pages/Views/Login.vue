@@ -3,18 +3,16 @@
         <form @submit.prevent="signIn()">
             <div class="field">
                 <label for="email">E-Mail</label>
-                <input type="email" id="email" v-model="usuario.email" 
-                    autocomplete="email" />
+                <input type="email" id="email" v-model="usuario.email" autocomplete="email" @keypress="clearResult()" @change="clearResult()" />
             </div>
 
             <div class="field">
                 <label for="email">Senha</label>
-                <input type="password" id="senha" v-model="usuario.senha" 
-                    autocomplete="current-password" />
+                <input type="password" id="senha" v-model="usuario.senha" autocomplete="current-password" @keypress="clearResult()" @change="clearResult()" />
             </div>
 
             <div class="button">
-                <button type="submit" :disabled="!formValido">Entrar</button>
+                <button type="submit">Entrar</button>
                 <mark class="error" v-if="result">{{ result }}</mark>
             </div>
 
@@ -28,14 +26,6 @@
         cadastre-se aqui.
     </div>
 
-    </p>
-
-    <p>
-        se não quer se cadastrar...<br />
-    <div @click="acessoLocal()">
-        <i class="pi pi-arrow-circle-down"></i>
-        acesso local.
-    </div>
     </p>
 </template>
 
@@ -63,7 +53,12 @@ export default defineComponent({
         }
     },
 
-    computed: {
+    emits: ['goToPage'],
+
+    methods: {
+        goToPage(page: string) {
+            this.$emit('goToPage', page);
+        },
         formValido() {
             if (!this.usuario.email || !this.usuario.senha) {
                 return false;
@@ -73,17 +68,14 @@ export default defineComponent({
             let senhaValida = this.senhaPattern.test(this.usuario.senha);
 
             return emailValido && senhaValida;
-        }
-    },
-
-    emits: ['goToPage'],
-
-    methods: {
-        goToPage(page: string) {
-            this.$emit('goToPage', page);
         },
-
         async signIn() {
+            
+            if(!this.formValido()){
+                this.result = "Os dados informados são inválidos.";
+                return;
+            }
+
             try {
                 this.result = undefined;
                 let access_token = await this.service.login(this.usuario);
@@ -99,6 +91,10 @@ export default defineComponent({
         acessoLocal() {
             localStorage.setItem('access_token', 'local_access');
             this.goToPage('Menu');
+        },
+        clearResult() {
+            if(this.result)
+                this.result = undefined;
         }
     }
 })

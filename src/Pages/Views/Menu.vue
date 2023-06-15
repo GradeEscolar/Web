@@ -51,7 +51,7 @@
 </template>
 
 <script lang="ts">
-import Auth from '@/api/Auth';
+import AuthService from '@/Services/AuthService';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
@@ -72,7 +72,7 @@ export default defineComponent({
     },
 
     mounted() {
-        if (!Auth.autenticado) {
+        if (!AuthService.autenticado) {
             this.goToPage('Home');
         }
     }

@@ -1,14 +1,12 @@
 import { AxiosStatic } from "axios";
 import Grade from "@/Models/Grade";
-import IGradeRepository, { GradeRepositoryFactory } from "@/Repositories/GradeRepository";
-import BaseService from "./BaseService";
-import DataAccessConfig from "@/DataAccess/DataAccessConfig";
+import GradeRepository from "@/Repositories/GradeRepository";
+import ServiceBase from "@/DataAccess/ServiceBase";
 
-export default class GradeService extends BaseService<IGradeRepository> {
+export default class GradeService extends ServiceBase<GradeRepository> {
    
-
-    async config(axios: AxiosStatic): Promise<boolean> {
-        return this.baseConfig(axios, GradeRepositoryFactory.CreateRepository);
+    constructor(axios: AxiosStatic) {
+        super(() => new GradeRepository(axios));
     }
 
     async obter(): Promise<Grade> {

@@ -39,12 +39,11 @@
 </template>
 
 <script lang="ts">
-import Auth from '@/api/Auth';
+import AuthService from '@/Services/AuthService';
 import Anotacao from '@/Models/Anotacao';
 import Grade from '@/Models/Grade';
 import Aula from '@/Models/Aula';
 import { defineComponent } from 'vue';
-import Api from '@/api/Api';
 import Dia from '@/Models/Dia';
 import AnotacaoComponent from '@/Pages/Components/Anotacao.vue';
 import Disciplina from '@/Models/Disciplina';
@@ -76,10 +75,10 @@ export default defineComponent({
         anotacao: Anotacao | undefined
     } {
         return {
-            disciplinaService: new DisciplinaService(),
-            gradeService: new GradeService(),
-            aulaService: new AulaService(),
-            anotacaoService: new AnotacaoService(),
+            disciplinaService: new DisciplinaService(this.axios),
+            gradeService: new GradeService(this.axios),
+            aulaService: new AulaService(this.axios),
+            anotacaoService: new AnotacaoService(this.axios),
             grade: undefined,
             disciplinas: undefined,
             disciplina: '',
@@ -172,13 +171,11 @@ export default defineComponent({
     },
 
     async mounted() {
-        if (!Auth.autenticado || !(await this.aulaService.config(this.axios))) {
+        if (!AuthService.autenticado) {
             this.goToPage('Home');
             return;
         }
-        await this.gradeService.config(this.axios);
-        await this.disciplinaService.config(this.axios);
-        await this.anotacaoService.config(this.axios);
+        
         this.$emit('hideBackButton', false);
         await this.obterDadosIniciais();
         await this.selecionarData(true);

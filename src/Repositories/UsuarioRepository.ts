@@ -1,12 +1,12 @@
 import { AxiosStatic } from "axios";
-import ApiRepository from "@/DataAccess/Repository/ApiRepository";
 import Usuario from "@/Models/Usuario";
-import DataAccessConfig from "@/DataAccess/DataAccessConfig";
+import RepositoryBase from "@/DataAccess/RepositoryBase";
+import AppConfig from "@/AppConfig";
 
-export default class UsuarioRepository extends ApiRepository<Usuario> {
+export default class UsuarioRepository extends RepositoryBase<Usuario> {
     
     constructor(axios: AxiosStatic) {
-        super(axios, DataAccessConfig.usuarioUrl);
+        super(AppConfig.usuarioUrl, axios);
     }
 
     cadastrar(usuario: Usuario): Promise<void> {

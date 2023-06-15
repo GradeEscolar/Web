@@ -14,12 +14,14 @@
 
             <div class="button">
                 <span v-if="!edicao">
-                    <button type="button" @click="editar()">Editar</button>
+                    <button v-if="!bloquearEdicao" type="button" @click="editar()">Editar</button>
+                    <button v-if="bloquearEdicao" type="button" @click="goToPage('DisciplinaConfig')">Editar Disciplinas</button>
                 </span>
                 <span v-else>
                     <button type="submit">Salvar</button>
                     <button type="reset">Cancelar</button>
                 </span>
+                <mark class="error" v-if="result">{{ result }}</mark>
             </div>
 
             <section class="table">
@@ -57,7 +59,7 @@ import Dia from '@/Models/Dia';
 import Aula from '@/Models/Aula';
 import { defineComponent } from 'vue';
 import Disciplina from '@/Models/Disciplina';
-import Auth from '@/api/Auth';
+import AuthService from '@/Services/AuthService';
 import DisciplinaService from '@/Services/DisciplinaService';
 import GradeService from '@/Services/GradeService';
 import AulaService from '@/Services/AulaService';
@@ -76,18 +78,22 @@ export default defineComponent({
         dia: number | undefined
         dias: Dia[],
         edicao: boolean,
+        result: string | undefined,
+        bloquearEdicao: boolean
     } {
         return {
-            disciplinaService: new DisciplinaService(),
-            gradeService: new GradeService(),
-            aulaService: new AulaService(),
+            disciplinaService: new DisciplinaService(this.axios),
+            gradeService: new GradeService(this.axios),
+            aulaService: new AulaService(this.axios),
             disciplinas: [],
             grade: new Grade(),
             aulasDb: [],
             aulas: [],
             dia: undefined,
             dias: [],
-            edicao: false
+            edicao: false,
+            result: undefined,
+            bloquearEdicao: false
         }
     },
 
@@ -118,6 +124,10 @@ export default defineComponent({
             const [disciplinas, grade] = await Promise.all([disciplinaPromise, gradePromise]);
             this.disciplinas = disciplinas;
             this.grade = grade;
+            this.bloquearEdicao = this.disciplinas.length == 0;
+            if (this.bloquearEdicao) {
+                this.result = "Não existem disciplinas cadastradas!";
+            }
         },
         async obterDados() {
             this.dia = this.dia ?? Number(this.grade.dias.substring(0, 1));
@@ -127,12 +137,11 @@ export default defineComponent({
     },
 
     async mounted() {
-        if (!Auth.autenticado || !(await this.aulaService.config(this.axios))){
+        if (!AuthService.autenticado){
             this.goToPage('Home');
             return;
         }
-        await this.gradeService.config(this.axios);
-        await this.disciplinaService.config(this.axios);
+        
         await this.obterDadosIniciais();
         await this.obterDados();
     },

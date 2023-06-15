@@ -1,14 +1,12 @@
 import { AxiosStatic } from "axios";
 import LoginRepository from "@/Repositories/LoginRepository";
 import Usuario from "@/Models/Usuario";
+import ServiceBase from "@/DataAccess/ServiceBase";
 
-export default class LoginService {
-
-    private repository: LoginRepository;
+export default class LoginService extends ServiceBase<LoginRepository> {
 
     constructor(axios: AxiosStatic) {
-        this.repository = new LoginRepository(axios);
-        this.repository.config();
+        super(() => new LoginRepository(axios))
     }
 
     async login(usuario: Usuario): Promise<string> {

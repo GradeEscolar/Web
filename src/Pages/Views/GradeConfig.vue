@@ -14,7 +14,7 @@
             <div class="field">
                 <label for="aulas">Aulas por dia</label>
                 <input type="number" id="aulas" name="aulas" min="1" max="10" step="1" required v-model.number="aulas"
-                    :disabled="!hasData" />
+                    :disabled="!hasData" @keypress="clearResult()" @change="clearResult()"  />
             </div>
 
             <div class="button">
@@ -32,7 +32,7 @@
 import Grade from '@/Models/Grade';
 import Dia from '@/Models/Dia';
 import { defineComponent } from 'vue';
-import Auth from '@/api/Auth';
+import AuthService from '@/Services/AuthService';
 import GradeService from '@/Services/GradeService';
 
 export default defineComponent({
@@ -47,7 +47,7 @@ export default defineComponent({
         result: string | undefined
     } {
         return {
-            service: new GradeService(),
+            service: new GradeService(this.axios),
             hasData: false,
             grade: new Grade(),
             aulas: 0,
@@ -77,14 +77,19 @@ export default defineComponent({
             this.hasData = true;
         },
         validar(dia: Dia) {
+            this.clearResult();
             if(this.dias.find(d => d.ativo) == undefined) {
                 dia.ativo = true;
             }
+        },
+        clearResult() {
+            if(this.result)
+                this.result = undefined;
         }
     },
 
     async mounted() {
-        if (!Auth.autenticado || !(await this.service.config(this.axios))){
+        if (!AuthService.autenticado){
             this.goToPage('Home');
             return;
         }

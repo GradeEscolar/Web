@@ -1,21 +1,17 @@
 import { AxiosStatic } from "axios";
 import IModel from "@/Models/IModel";
-import IRepository from "./IRepository";
-import ApiDataContext from "../DataContext/ApiDataContext";
+import DataContext from "./DataContext";
+import IRepositoryBase from "./IRepositoryBase";
 
-export default abstract class ApiRepository<T extends IModel> extends ApiDataContext implements IRepository<T> {
+export default abstract class RepositoryBase<T extends IModel> extends DataContext implements IRepositoryBase<T> {
 
     protected get axios(): AxiosStatic {
-        return this.source as AxiosStatic;
-    }
-
-    public get acessoLocal(): boolean {
-        return false;
+        return this.source;
     }
 
     protected url: string;
 
-    constructor(axios: AxiosStatic, url: string) {
+    constructor(url: string, axios: AxiosStatic) {
         super(axios);
         this.url = url;
     }
