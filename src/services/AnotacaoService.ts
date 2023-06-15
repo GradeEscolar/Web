@@ -1,9 +1,9 @@
 import { AxiosStatic } from "axios";
-import BaseService from "./BaseService";
 import IAnotacaoRepository, { AnotacaoRepositoryFactory } from "@/Repositories/AnotacaoRepository";
 import Aula from "@/Models/Aula";
 import Anotacao from "@/Models/Anotacao";
 import Disciplina from "@/Models/Disciplina";
+import BaseService from "./BaseService";
 
 export default class AnotacaoService extends BaseService<IAnotacaoRepository> {
 
