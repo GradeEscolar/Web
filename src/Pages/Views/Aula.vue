@@ -1,5 +1,5 @@
 <template>
-    <section class="form">
+    <section class="form" v-if="grade">
         <form>
             <div class="field">
                 <label for="data">Data</label>
@@ -152,20 +152,22 @@ export default defineComponent({
             let data = this.$refs.data as HTMLInputElement;
             data.focus();
         },
-        async obterDadosIniciais() {
-            const disciplinaPromise = this.disciplinaService.obter();
-            const gradePromise = this.gradeService.obter();
-            const [disciplinas, grade] = await Promise.all([disciplinaPromise, gradePromise]);
-            this.disciplinas = disciplinas;
-            this.grade = grade;
+        async obterDadosIniciais(): Promise<boolean> {
+            try {
+                this.grade = await this.gradeService.obter();
+                this.disciplinas = await this.disciplinaService.obter();
+                let dataSessao = sessionStorage.getItem('aula_data');
+                if (dataSessao) {
+                    this.data = dataSessao;
+                } else {
+                    let curDate = new Date(Date.now() - 180 * 60 * 1000);
+                    this.data = curDate.toISOString().substring(0, 10);
+                    sessionStorage.setItem('data', this.data);
+                }
 
-            let dataSessao = sessionStorage.getItem('aula_data');
-            if (dataSessao) {
-                this.data = dataSessao;
-            } else {
-                let curDate = new Date(Date.now() - 180 * 60 * 1000);
-                this.data = curDate.toISOString().substring(0, 10);
-                sessionStorage.setItem('data', this.data);
+                return true;
+            } catch (error) {
+                return false;
             }
         },
     },
@@ -175,10 +177,11 @@ export default defineComponent({
             this.goToPage('Home');
             return;
         }
-        
+
         this.$emit('hideBackButton', false);
-        await this.obterDadosIniciais();
-        await this.selecionarData(true);
+        if(await this.obterDadosIniciais()){
+            await this.selecionarData(true);
+        }
     },
 
     watch: {

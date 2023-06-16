@@ -1,5 +1,5 @@
 <template>
-    <section class="form">
+    <section class="form" v-if="grade">
         <form @submit.prevent="persistirGrade()" @reset.prevent="lerGrade()">
 
             <label class="checkboxlist">Dias de aula</label>
@@ -41,7 +41,7 @@ export default defineComponent({
     data(): {
         service: GradeService,
         hasData: boolean,
-        grade: Grade,
+        grade: Grade | undefined,
         aulas: number,
         dias: Dia[],
         result: string | undefined
@@ -49,7 +49,7 @@ export default defineComponent({
         return {
             service: new GradeService(this.axios),
             hasData: false,
-            grade: new Grade(),
+            grade: undefined,
             aulas: 0,
             dias: Dia.dias(),
             result: undefined
@@ -62,19 +62,23 @@ export default defineComponent({
             this.$emit('goToPage', page);
         },
         lerGrade() {
-            this.dias = Dia.montarTodos(this.grade.dias);
-            this.aulas = this.grade.aulas
+            this.dias = Dia.montarTodos(this.grade!.dias);
+            this.aulas = this.grade!.aulas
         },
         async persistirGrade() {
-            this.grade.dias = Dia.desmontar(this.dias);
-            this.grade.aulas = this.aulas;
-            await this.service.atualizar(this.grade);
+            this.grade!.dias = Dia.desmontar(this.dias);
+            this.grade!.aulas = this.aulas;
+            await this.service.atualizar(this.grade!);
             this.result = "Grade salva!";
         },
         async obterGrade() {
-            this.grade = await this.service.obter();
-            this.lerGrade();
-            this.hasData = true;
+            try {
+                this.grade = await this.service.obter();    
+                this.lerGrade();
+                this.hasData = true;
+            } catch (error) {
+                this.grade = undefined;
+            }            
         },
         validar(dia: Dia) {
             this.clearResult();

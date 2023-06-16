@@ -1,5 +1,5 @@
 <template>
-    <section class="form">
+    <section class="form" v-if="disciplinas">
         <form @submit.prevent="submit()" @reset.prevent="reset()">
 
             <div class="field">
@@ -69,7 +69,7 @@ export default defineComponent({
                 this.disciplinas = await this.service.obter();
             } catch (error: any) {
                 this.result = "Houve uma falha ao obter as disciplinas.";
-                this.disciplinas = new Array<Disciplina>();
+                this.disciplinas = undefined;
             }
 
             this.disciplina = new Disciplina();
@@ -78,12 +78,12 @@ export default defineComponent({
             this.focus();
         },
         focus() {
-            let input = this.$refs.disciplinaInput as HTMLInputElement;
-            input.focus();
+            let input = this.$refs.disciplinaInput as HTMLInputElement | undefined;
+            if(input)
+                input.focus();
         },
         
         async submit() {
-
             
             if(!this.disciplina.disciplina || this.disciplina.disciplina.trim() == '') {
                 this.result = 'Informe o nome da disciplina.';
@@ -117,7 +117,7 @@ export default defineComponent({
         },
         async del() {
             try {
-                await this.service.excluir(this.disciplina);
+                await this.service.excluir(this.disciplina!);
                 await this.obter();
             } catch (error: any) {
                 let response = error.response.data as DefaultResponse;

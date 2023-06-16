@@ -1,7 +1,5 @@
 <template>
-    <section class="form">
-
-
+    <section class="form" v-if="grade">
 
         <form @submit.prevent="salvar()" @reset.prevent="cancelar()">
 
@@ -15,7 +13,8 @@
             <div class="button">
                 <span v-if="!edicao">
                     <button v-if="!bloquearEdicao" type="button" @click="editar()">Editar</button>
-                    <button v-if="bloquearEdicao" type="button" @click="goToPage('DisciplinaConfig')">Editar Disciplinas</button>
+                    <button v-if="bloquearEdicao" type="button" @click="goToPage('DisciplinaConfig')">Editar
+                        Disciplinas</button>
                 </span>
                 <span v-else>
                     <button type="submit">Salvar</button>
@@ -72,7 +71,7 @@ export default defineComponent({
         gradeService: GradeService,
         aulaService: AulaService,
         disciplinas: Disciplina[],
-        grade: Grade,
+        grade: Grade | undefined,
         aulasDb: Aula[],
         aulas: Aula[],
         dia: number | undefined
@@ -86,7 +85,7 @@ export default defineComponent({
             gradeService: new GradeService(this.axios),
             aulaService: new AulaService(this.axios),
             disciplinas: [],
-            grade: new Grade(),
+            grade: undefined,
             aulasDb: [],
             aulas: [],
             dia: undefined,
@@ -115,21 +114,25 @@ export default defineComponent({
             this.edicao = false;
         },
         ler() {
-            this.dias = Dia.montarAtivos(this.grade.dias);
-            this.aulas = Aula.montar(this.grade, this.aulasDb, this.dia!);
+            this.dias = Dia.montarAtivos(this.grade!.dias);
+            this.aulas = Aula.montar(this.grade!, this.aulasDb, this.dia!);
         },
         async obterDadosIniciais() {
-            const disciplinaPromise = this.disciplinaService.obter();
-            const gradePromise = this.gradeService.obter();
-            const [disciplinas, grade] = await Promise.all([disciplinaPromise, gradePromise]);
-            this.disciplinas = disciplinas;
-            this.grade = grade;
-            this.bloquearEdicao = this.disciplinas.length == 0;
-            if (this.bloquearEdicao) {
-                this.result = "Não existem disciplinas cadastradas!";
+            try {
+                this.grade = await this.gradeService.obter();
+                this.disciplinas = await this.disciplinaService.obter();
+                this.bloquearEdicao = this.disciplinas.length == 0;
+                if (this.bloquearEdicao) {
+                    this.result = "Não existem disciplinas cadastradas!";
+                }
+            } catch (error) {
+                this.grade = undefined;
             }
         },
         async obterDados() {
+            if(!this.grade)
+                return;
+            
             this.dia = this.dia ?? Number(this.grade.dias.substring(0, 1));
             this.aulasDb = await this.aulaService.obter(this.grade.id, this.dia);
             this.ler();
@@ -137,11 +140,11 @@ export default defineComponent({
     },
 
     async mounted() {
-        if (!AuthService.autenticado){
+        if (!AuthService.autenticado) {
             this.goToPage('Home');
             return;
         }
-        
+
         await this.obterDadosIniciais();
         await this.obterDados();
     },

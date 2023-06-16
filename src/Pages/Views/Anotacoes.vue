@@ -87,9 +87,14 @@ export default defineComponent({
             this.$emit('goToPage', page);
         },
         async obterDisciplinas() {
-            this.disciplinas = await this.disciplinaService.obter();
-            if (this.disciplinas) {
-                this.disciplina = this.disciplinas[0];
+            try {
+                this.disciplinas = await this.disciplinaService.obter();
+                if (this.disciplinas) {
+                    this.disciplina = this.disciplinas[0];
+                }
+                return true;
+            } catch (error) {
+                return false;
             }
         },
         async obterAnotacoes() {
@@ -122,8 +127,10 @@ export default defineComponent({
         }
 
         this.mes = Dia.mesAtual();
-        await this.obterDisciplinas();
-        await this.obterAnotacoes();
+        if (await this.obterDisciplinas()) {
+            await this.obterAnotacoes();
+        }
+
     },
 
     watch: {
