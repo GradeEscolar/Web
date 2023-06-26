@@ -30,6 +30,16 @@
             </tbody>
         </table>
     </section>
+
+    <MsgBoxComponent 
+        v-if="exibirExcluir"
+        titulo="Excluir Disciplina" 
+        mensagem="As aulas e anotações desta disciplina também serão excluídas!<br />Você confirma esta exclusão?" 
+        icone="pi pi-trash" 
+        yes 
+        no
+        @msgbox-result="msgboxResult" />
+
 </template>
 
 <script lang="ts">
@@ -38,23 +48,30 @@ import Disciplina from '@/Models/Disciplina'
 import DefaultResponse from '@/Models/DefaultResponse';
 import AuthService from '@/Services/AuthService';
 import DisciplinaService from '@/Services/DisciplinaService';
+import MsgBoxComponent from '@/Pages/Components/MsgBox.vue';
 
 export default defineComponent({
     name: 'DisciplinaConfigView',
+    
+    components: {
+        MsgBoxComponent
+    },
 
     data(): {
         service: DisciplinaService,
         result: string | undefined,
         disciplina: Disciplina,
         disciplinaSelecionada: Disciplina | undefined,
-        disciplinas: Disciplina[] | undefined
+        disciplinas: Disciplina[] | undefined,
+        exibirExcluir: boolean
     } {
         return {
             service: new DisciplinaService(this.axios),
             result: undefined,
             disciplina: new Disciplina(),
             disciplinaSelecionada: undefined,
-            disciplinas: undefined
+            disciplinas: undefined,
+            exibirExcluir: false
         }
     },
 
@@ -96,8 +113,6 @@ export default defineComponent({
                 return;
             }
 
-
-
             try {
                 if (!this.disciplinaSelecionada)
                     await this.service.criar(this.disciplina);
@@ -115,14 +130,8 @@ export default defineComponent({
             this.disciplinaSelecionada = undefined;
             this.focus();
         },
-        async del() {
-            try {
-                await this.service.excluir(this.disciplina!);
-                await this.obter();
-            } catch (error: any) {
-                let response = error.response.data as DefaultResponse;
-                this.result = response.message;
-            }
+        del() {
+            this.exibirExcluir = true;
         },
         selecionar(disciplina: Disciplina) {
             this.disciplinaSelecionada = this.service.clone(disciplina)
@@ -135,6 +144,20 @@ export default defineComponent({
         clearResult() {
             if(this.result)
                 this.result = undefined;
+        },
+        async msgboxResult(result: boolean){
+            this.exibirExcluir = false;
+            
+            if(!result)
+                return;
+
+            try {
+                await this.service.excluir(this.disciplina!);
+                await this.obter();
+            } catch (error: any) {
+                let response = error.response.data as DefaultResponse;
+                this.result = response.message;
+            }
         }
     },
 

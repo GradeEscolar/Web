@@ -66,7 +66,6 @@ import AnotacoesView from './Pages/Views/Anotacoes.vue';
 import DisciplinaConfigView from './Pages/Views/DisciplinaConfig.vue';
 import GradeConfigView from './Pages/Views/GradeConfig.vue';
 import AulaConfigView from './Pages/Views/AulaConfig.vue';
-import AppConfig from './AppConfig';
 
 export default defineComponent({
   name: 'App',
@@ -175,7 +174,7 @@ export default defineComponent({
 
 :root {
   --header-height: 60px;
-  --footer-height: 15px;
+  --footer-height: 20px;
   --header-footer-height: 75px;
   --disciplina-form-height: 106px;
   --header-icon-box-border-color: rgb(40, 50, 55);
@@ -204,7 +203,7 @@ export default defineComponent({
   --evento-background-color: rgb(255, 225, 225);
   --evento-border-color: rgb(155, 100, 100);
   --evento-color: rgb(55, 0, 0);
-
+  --disabled-text-color: rgb(40, 50, 55);
 }
 
 /* markdown */
@@ -317,7 +316,7 @@ footer {
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 15px;
+  height: 20px;
   z-index: 1;
   background-color: rgb(250, 250, 250);
   box-shadow: 0 0 2px 2px white;
