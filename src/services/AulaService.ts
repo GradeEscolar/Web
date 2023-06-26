@@ -2,6 +2,7 @@ import { AxiosStatic } from "axios";
 import Aula from "@/Models/Aula";
 import AulaRepository from "@/Repositories/AulaRepository";
 import ServiceBase from "@/DataAccess/ServiceBase";
+import Grade from "@/Models/Grade";
 
 export default class AulaService extends ServiceBase<AulaRepository> {
    
@@ -9,11 +10,16 @@ export default class AulaService extends ServiceBase<AulaRepository> {
         super(() => new AulaRepository(axios));
     }
 
-    obter(id_grade: number, dia: number): Promise<Aula[]> {
+    async obter(grade: Grade, dia: number): Promise<Aula[]> {
+        if(grade.dias.indexOf(dia.toString()) == -1){
+            return Promise.resolve(new Array<Aula>());
+        }
+        
         const filtro = new Aula();
-        filtro.id_grade = id_grade;
+        filtro.id_grade = grade.id;
         filtro.dia = dia;
-        return this.repository.obter(filtro);
+        const aulas = await this.repository.obter(filtro);
+        return aulas.filter(a => a.aula <= grade.aulas);
     }
 
     salvar(aulas: Aula[]): Promise<void> {
