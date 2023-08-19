@@ -13,7 +13,7 @@
 
             <div class="field">
                 <label for="aulas">Aulas por dia</label>
-                <input type="number" id="aulas" name="aulas" min="1" max="10" step="1" required v-model.number="aulas"
+                <input type="number" id="aulas" name="aulas" min="1" max="15" step="1" required v-model.number="aulas"
                     :disabled="!hasData" @keypress="clearResult()" @change="clearResult()"  />
             </div>
 
