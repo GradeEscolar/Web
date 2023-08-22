@@ -116,9 +116,6 @@ export default defineComponent({
         },
         obterDisciplina(id_disciplina: number | undefined): string | undefined {
             return this.disciplinas?.find(d => d.id == id_disciplina)?.disciplina;
-        },
-        aulas() {
-            this.goToPage('Aula');
         }
     },
 

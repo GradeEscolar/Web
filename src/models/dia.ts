@@ -61,11 +61,6 @@ export default class Dia {
         return data.toISOString().substring(0, 7);
     }
 
-    static obterData(isoDate: string): string {
-        let dt = new Date(`${isoDate}T00:00:00.000-03:00`);
-        return dt.toISOString().substring(0, 10);
-    }
-
     static dataCompleta(data: Date): string {
         return `${this.dias().find(d => d.dia == data.getDay() + 1)!.nome}, ${data.getDate()} de ${this.meses()[data.getMonth()]} de ${data.getFullYear()}`;
     }
