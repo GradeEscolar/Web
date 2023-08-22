@@ -54,7 +54,16 @@ export default class Dia {
 
     static mesAtual(): string {
         let data = this.dataAtual();
+        return this.obterMes(data);
+    }
+
+    static obterMes(data: Date): string {
         return data.toISOString().substring(0, 7);
+    }
+
+    static obterData(isoDate: string): string {
+        let dt = new Date(`${isoDate}T00:00:00.000-03:00`);
+        return dt.toISOString().substring(0, 10);
     }
 
     static dataCompleta(data: Date): string {

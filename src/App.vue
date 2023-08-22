@@ -518,4 +518,10 @@ tbody tr td select {
 }
 
 /* print */
+
+.lnk {
+    cursor: pointer;
+    margin: 0 10px 0 10px;
+    color: var(--lnk-color);
+}
 </style>

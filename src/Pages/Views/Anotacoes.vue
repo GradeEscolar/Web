@@ -13,17 +13,18 @@
                     <input type="month" id="mes" v-model="mes" @change="obterAnotacoes()" />
                 </div>
 
-                <div class="field" v-if="anotacoes?.length ?? 0 >= 1">
-                    <span class="no-print">
+                <div class="field no-print" v-if="anotacoes?.length ?? 0 >= 1">
+                    <span>
                         <input type="checkbox" id="titulos" name="titulos" v-model="exibirTitulos" />
                         <label for="titulos">Exibir títulos</label>
                     </span>
                 </div>
-                <div v-else class="info">
-                    <mark class="info">Não existem anotações.</mark>
-                </div>
-
             </span>
+
+            <div v-else class="info">
+                <mark class="info">Não existem anotações.</mark>
+            </div>
+
             <div v-else class="info">
                 <mark class="info">Não existem disciplinas cadastradas.</mark>
             </div>
@@ -31,7 +32,7 @@
     </section>
 
     <span v-for="anotacao in anotacoes">
-        <AnotacaoComponent :anotacao="anotacao" :disciplina="disciplina?.disciplina" :exibir-titulos="exibirTitulos">
+        <AnotacaoComponent :anotacao="anotacao" :disciplina="disciplina" :exibir-titulos="exibirTitulos" origem="anotacao" @go-to-page="goToPage">
         </AnotacaoComponent>
     </span>
 </template>
@@ -62,7 +63,8 @@ export default defineComponent({
         exibirTitulos: boolean,
         anotacoes: Anotacao[] | undefined,
         mes: string | undefined,
-        md: MarkdownIt
+        md: MarkdownIt,
+
     } {
         return {
             anotacaoService: new AnotacaoService(this.axios),
@@ -90,7 +92,9 @@ export default defineComponent({
             try {
                 this.disciplinas = await this.disciplinaService.obter();
                 if (this.disciplinas) {
-                    this.disciplina = this.disciplinas[0];
+                    const id = sessionStorage.getItem('anotacoes_disciplina');
+                    const disciplina = this.disciplinas.find(d => d.id == parseInt(id ?? '0'));
+                    this.disciplina = disciplina ?? this.disciplinas[0];
                 }
                 return true;
             } catch (error) {
@@ -113,6 +117,9 @@ export default defineComponent({
         obterDisciplina(id_disciplina: number | undefined): string | undefined {
             return this.disciplinas?.find(d => d.id == id_disciplina)?.disciplina;
         },
+        aulas() {
+            this.goToPage('Aula');
+        }
     },
 
     async mounted() {
@@ -126,7 +133,7 @@ export default defineComponent({
             this.exibirTitulos = exibirTitulos == 's';
         }
 
-        this.mes = Dia.mesAtual();
+        this.mes = sessionStorage.getItem('anotacoes_mes') ?? Dia.mesAtual();
         if (await this.obterDisciplinas()) {
             await this.obterAnotacoes();
         }
@@ -136,6 +143,14 @@ export default defineComponent({
     watch: {
         exibirTitulos(newData: boolean) {
             localStorage.setItem('exibir_titulos', newData ? 's' : 'n');
+        },
+
+        mes(newData: string) {
+            sessionStorage.setItem('anotacoes_mes', newData);
+        },
+
+        disciplina(newData: Disciplina) {
+            sessionStorage.setItem('anotacoes_disciplina', newData.id?.toString() ?? '');
         }
     }
 });
